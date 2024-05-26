@@ -2,6 +2,7 @@
 
 Board::Board()
 {
+	this->whitePieces.at(2).setPosition(32);
 }
 
 std::array<PieceData, 64> Board::getBoardState() {
