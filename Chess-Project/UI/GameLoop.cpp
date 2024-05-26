@@ -1,14 +1,6 @@
 #include "GameLoop.h"
 
-std::ostream& operator<<(std::ostream& s, const sf::Vector2f& o) {
-	s << "( " << o.x << ", " << o.y << " )";
-	return s;
-}
 
-void DrawSquare(sf::RenderWindow& window, const PieceData& piece, const sf::RectangleShape& square, int squareSize) {
-	window.draw(square);
-	window.draw(PieceView(piece, square.getPosition(), squareSize).getDrawable());
-}
 
 void GameLoop(BoardView& board)
 {
@@ -43,9 +35,69 @@ void GameLoop(BoardView& board)
 		}
 		boardState = board.getBoardState();
 		window.clear();
+		sf::RectangleShape piece(sf::Vector2f(squareSize, squareSize));
 		// re-render logic start
 		for (int i = 0; i < 64; i++) {
-			DrawSquare(window, boardState.at(i), boardView.at(i), squareSize);
+			window.draw(boardView.at(i));
+			piece.setPosition(boardView.at(i).getPosition());
+			switch (boardState.at(i).pieceType){
+			case PieceType::Pawn:
+				if (boardState.at(i).isWhite) {
+					piece.setTexture(&textures.whitePawn);
+				}
+				else {
+					piece.setTexture(&textures.blackPawn);
+				}
+				window.draw(piece);
+				break;
+			case PieceType::Knight:
+				if (boardState.at(i).isWhite) {
+					piece.setTexture(&textures.whiteKnight);
+				}
+				else {
+					piece.setTexture(&textures.blackKnight);
+				}
+				window.draw(piece);
+				break;
+			case PieceType::Bishop:
+				if (boardState.at(i).isWhite) {
+					piece.setTexture(&textures.whiteBishop);
+				}
+				else {
+					piece.setTexture(&textures.blackBishop);
+				}
+				window.draw(piece);
+				break;
+			case PieceType::Rook:
+				if (boardState.at(i).isWhite) {
+					piece.setTexture(&textures.whiteRook);
+				}
+				else {
+					piece.setTexture(&textures.blackRook);
+				}
+				window.draw(piece);
+				break;
+			case PieceType::Queen:
+				if (boardState.at(i).isWhite) {
+					piece.setTexture(&textures.whiteQueen);
+				}
+				else {
+					piece.setTexture(&textures.blackQueen);
+				}
+				window.draw(piece);
+				break;
+			case PieceType::King:
+				if (boardState.at(i).isWhite) {
+					piece.setTexture(&textures.whiteKing);
+				}
+				else {
+					piece.setTexture(&textures.blackKing);
+				}
+				window.draw(piece);
+				break;
+			default:
+				break;
+		}
 		}
 		// re-render logic end
 		window.display();

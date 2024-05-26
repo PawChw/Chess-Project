@@ -3,7 +3,7 @@
 #include<iostream>
 #include "../BoardView.h"
 #include "Textures.h"
-#include "PieceView.h"
+#include<vector>;
 
 void GameLoop(BoardView& board);
 
