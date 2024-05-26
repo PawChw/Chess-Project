@@ -26,8 +26,8 @@ bool BitboardHelpers::SquareIsSet(uint64_t& bitboard, uint8_t index)
 
 uint8_t BitboardHelpers::ClearAndGetIngexOfLSB(uint64_t& bitboard)
 {
-	uint8_t index = 0;
-	while (((bitboard >> index) & 1 && index < 64) != 1)
+	uint8_t index = 63;
+	while (((bitboard >> index) & 1 && index > 0) != 1)
 		index++;
 	ClearSquare(bitboard, index);
 	return index;
