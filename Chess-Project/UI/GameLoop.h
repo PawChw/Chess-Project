@@ -3,6 +3,7 @@
 #include<iostream>
 #include "../BoardView.h"
 #include "Textures.h"
+#include "PieceView.h"
 
 void GameLoop(BoardView& board);
 

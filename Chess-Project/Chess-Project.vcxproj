@@ -148,6 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Chess\Board.cpp" />
+    <ClCompile Include="UI\PieceView.cpp" />
     <ClCompile Include="UI\GameLoop.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="UI\Textures.cpp" />
@@ -155,6 +156,7 @@
   <ItemGroup>
     <ClInclude Include="Chess\Board.h" />
     <ClInclude Include="Chess\Pieces\Piece.h" />
+    <ClInclude Include="UI\PieceView.h" />
     <ClInclude Include="UI\GameLoop.h" />
     <ClInclude Include="BoardView.h" />
     <ClInclude Include="UI\Textures.h" />

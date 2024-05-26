@@ -5,6 +5,11 @@ std::ostream& operator<<(std::ostream& s, const sf::Vector2f& o) {
 	return s;
 }
 
+void DrawSquare(sf::RenderWindow& window, const PieceData& piece, const sf::RectangleShape& square, int squareSize) {
+	window.draw(square);
+	window.draw(PieceView(piece, square.getPosition(), squareSize).getDrawable());
+}
+
 void GameLoop(BoardView& board)
 {
 	sf::RenderWindow window(sf::VideoMode(800, 640), "Test");
@@ -38,20 +43,9 @@ void GameLoop(BoardView& board)
 		}
 		boardState = board.getBoardState();
 		window.clear();
-		sf::RectangleShape piece(sf::Vector2f(squareSize, squareSize));
 		// re-render logic start
 		for (int i = 0; i < 64; i++) {
-			window.draw(boardView.at(i));
-			switch (boardState.at(i).pieceType)
-			{
-			case PieceType::Pawn:
-				piece.setPosition(boardView.at(i).getPosition());
-				if (boardState.at(i).isWhite) piece.setTexture(&textures.whitePawn);
-				else piece.setTexture(&textures.blackPawn);
-				window.draw(piece);
-			default:
-				break;
-			}
+			DrawSquare(window, boardState.at(i), boardView.at(i), squareSize);
 		}
 		// re-render logic end
 		window.display();
