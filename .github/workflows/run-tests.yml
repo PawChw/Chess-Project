@@ -16,5 +16,5 @@ jobs:
               with:
                 vs-version: '17'
                 msbuild-architecture: 'x64'
-            - run: msbuild Chess-Project/Chess-Project.vcxproj
+            - run: msbuild Chess-Project/Chess-Project.vcxproj -p:Configuration=Release -p:Platform=x64
 
