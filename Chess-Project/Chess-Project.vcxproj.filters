@@ -24,6 +24,9 @@
     <ClCompile Include="Chess\Board.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UI\Textures.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UI\GameLoop.h">
@@ -35,5 +38,49 @@
     <ClInclude Include="Chess\Board.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Chess\Pieces\Piece.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\Textures.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="UI\Assets\Pieces\Default\bb.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="UI\Assets\Pieces\Default\bk.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="UI\Assets\Pieces\Default\bn.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="UI\Assets\Pieces\Default\bp.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="UI\Assets\Pieces\Default\bq.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="UI\Assets\Pieces\Default\br.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="UI\Assets\Pieces\Default\wb.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="UI\Assets\Pieces\Default\wk.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="UI\Assets\Pieces\Default\wn.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="UI\Assets\Pieces\Default\wp.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="UI\Assets\Pieces\Default\wq.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="UI\Assets\Pieces\Default\wr.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
