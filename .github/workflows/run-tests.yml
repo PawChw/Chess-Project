@@ -1,0 +1,20 @@
+name: Run Compilation Test
+
+on:
+    push:
+        branches: [ main ]
+    pull_request:
+        branches: [ main ]
+
+jobs:
+    build:
+        runs-on: windows-latest
+
+        steps:
+            - uses: actions/checkout@v2
+            - uses: microsoft/setup-msbuild@v2
+              with:
+                vs-version: '17'
+                msbuild-architecture: 'x64'
+            - run: msbuild Chess-Project/Chess-Project.vcxproj
+
