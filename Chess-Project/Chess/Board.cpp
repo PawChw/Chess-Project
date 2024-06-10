@@ -4,20 +4,20 @@
 void Board::MakeMove(Move move)
 {
     // Check if the move is legal
-    if (legalMovesCache == nullptr) GetLegalMoves();
-    if (std::find(legalMovesCache->begin(), legalMovesCache->end(), move) == legalMovesCache->end()) {
+    if (legalMovesCache.empty()) GetLegalMoves();
+    if (isMoveInVector(legalMovesCache, move)) {
         throw std::invalid_argument("Illegal move");
     }
 
     return ForceMakeMove(move);
 }
 
-void Board::MoveBlocker(Square newBlockerPosition)
+void Board::MoveBlocker(Square newBlockerSquare)
 {
-    if (!isValidSquare(newBlockerPosition)) throw std::invalid_argument("Can't move blocker to void");
+    if (!isValidSquare(newBlockerSquare)  || blockerSquare == newBlockerSquare) throw std::invalid_argument("Illegal blocker move");
     Bitboard bb = getAllPiecesBitboard();
-    if(BitboardHelpers::getBit(bb, newBlockerPosition)) throw std::invalid_argument("Can't capture with blocker");
-    blockerSquare = newBlockerPosition;
+    if(BitboardHelpers::getBit(bb, newBlockerSquare)) throw std::invalid_argument("Illegal blocker move");
+    blockerSquare = newBlockerSquare;
 }
 
 void Board::ForceMakeMove(Move move)
@@ -76,7 +76,7 @@ void Board::ForceMakeMove(Move move)
 
     gameMoveHistory.push_back(move);
     if (getColor(move.movedPiece) == Black) fullMoveClock++;
-    legalMovesCache.reset();
+    legalMovesCache.clear();
     gameHistory.push_back(getZorbistKey());
 }
 
@@ -127,7 +127,7 @@ void Board::UndoMove() {
     gameMoveHistory.pop_back();
     gameHistory.pop_back();
     if (getColor(move.movedPiece) == Black) fullMoveClock--;
-    legalMovesCache.reset();
+    legalMovesCache.clear();
 }
 
 void Board::ParseFEN(std::string FEN)
@@ -241,12 +241,10 @@ Board::Board(std::string toParse)
 
 const std::shared_ptr<const std::vector<Move>> Board::GetLegalMoves()
 {
-    std::cout << legalMovesCache << std::endl;
     if (legalMovesCache == nullptr) {
         auto gen = Generator(*this);
         legalMovesCache = std::make_shared<const std::vector<Move>>(gen.GenerateLegalMoves());
     }
-    std::cout << legalMovesCache->size() << std::endl;
     return legalMovesCache;
 }
 

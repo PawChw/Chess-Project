@@ -13,6 +13,7 @@
 #include "Move.h"
 #include "Parser.h"
 #include "ZobristKey.h"
+#include "MoveHelper.h"
 
 template <typename T, int S>
 bool compareArrays(const std::array<T, S>& arr1, const std::array<T, S>& arr2) {
@@ -23,7 +24,7 @@ bool compareArrays(const std::array<T, S>& arr1, const std::array<T, S>& arr2) {
 using namespace PieceUtils;
 class Board {
 private:
-	std::shared_ptr<const std::vector<Move>> legalMovesCache = std::make_shared<const std::vector<Move>>();
+	std::vector<Move> legalMovesCache;
 	std::vector<Move> gameMoveHistory;
 	std::vector<Zobrist> gameHistory;
 	std::vector<unsigned int> historicHalfMoves;
@@ -41,9 +42,9 @@ public:
 		blackKing = 60,
 		blockerSquare = -1;
 	std::array<std::array<bool, 2>, 2 > castleRights = { {{true, true}, {true, true}} }; // k, q, K, Q
-	const std::shared_ptr<const std::vector<Move>> GetLegalMoves();
+	const std::vector<Move>& GetLegalMoves();
 	void MakeMove(Move move);
-	void MoveBlocker(Square newBlockerPosition);
+	void MoveBlocker(Square newBlockerSquare);
 	void ForceMakeMove(Move move);
 	void UndoMove();
 	Bitboard getBitboard(PieceType pieceType) const;

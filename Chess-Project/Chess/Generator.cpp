@@ -96,16 +96,6 @@ std::vector<Move> Generator::GenerateLegalMoves()
 	move.capturedPiece = None;
 	move.castleRightsLost.set({ false, false, false, false });
 	move.castleRightsLost.set(static_cast<int>(movesFor), { board.castleRights[static_cast<int>(movesFor)][0], board.castleRights[static_cast<int>(movesFor)][1] });
-	if (board.castleRights[static_cast<int>(movesFor)][0]
-		&& !static_cast<bool>(allPiecesBitboard & castleChecks[static_cast<int>(movesFor)][0])
-		&& !board.isSquareAttacked(ourKingSquare, !movesFor)
-		&& !board.isSquareAttacked(ourKingSquare+1, !movesFor)
-		&& !board.isSquareAttacked(ourKingSquare+2, !movesFor)
-		&& !board.isSquareAttacked(ourKingSquare+3, !movesFor)) {
-		move.to = ourKingSquare + 2;
-		move.isCastle.set(true, false);
-		moves.push_back(move);
-	}
 	if (board.castleRights[static_cast<int>(movesFor)][1]
 		&& !static_cast<bool>(allPiecesBitboard & castleChecks[static_cast<int>(movesFor)][1])
 		&& !board.isSquareAttacked(ourKingSquare, !movesFor)
@@ -115,6 +105,16 @@ std::vector<Move> Generator::GenerateLegalMoves()
 		&& !board.isSquareAttacked(ourKingSquare - 4, !movesFor)) {
 		move.to = ourKingSquare - 2;
 		move.isCastle.set(false, true);
+		moves.push_back(move);
+	}
+	if (board.castleRights[static_cast<int>(movesFor)][0]
+		&& !static_cast<bool>(allPiecesBitboard & castleChecks[static_cast<int>(movesFor)][0])
+		&& !board.isSquareAttacked(ourKingSquare, !movesFor)
+		&& !board.isSquareAttacked(ourKingSquare + 1, !movesFor)
+		&& !board.isSquareAttacked(ourKingSquare + 2, !movesFor)
+		&& !board.isSquareAttacked(ourKingSquare + 3, !movesFor)) {
+		move.to = ourKingSquare + 2;
+		move.isCastle.set(true, false);
 		moves.push_back(move);
 	}
 	return moves;

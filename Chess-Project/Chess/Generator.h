@@ -21,6 +21,12 @@ public:
 	Generator() = delete;
 	Generator(const Board& board);
 	Generator(const Board& board, bool movesFor);
-	std::vector<Move> GenerateLegalMoves();
+	std::vector<Move> GenerateLegalMoves(); /*
+		Moves are in order!
+		movedPiece asc
+		from asc
+		to asc
+		promotedToPieceType asc(for pawns only)
+		*/
 };
 

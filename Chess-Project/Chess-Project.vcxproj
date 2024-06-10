@@ -83,12 +83,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Chess\Board.cpp" />
-    <ClCompile Include="Chess\ChessConsole.cpp" />
     <ClCompile Include="Chess\Generator.cpp" />
     <ClCompile Include="Chess\MoveGen.cpp" />
+    <ClCompile Include="Chess\MoveHelper.cpp" />
     <ClCompile Include="Chess\Parser.cpp" />
     <ClCompile Include="Chess\ZobristKey.cpp" />
+    <ClCompile Include="Game\BlockerGame.cpp" />
     <ClCompile Include="Game\Game.cpp" />
+    <ClCompile Include="Players\HumanPlayer.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -130,12 +132,18 @@
     <ClInclude Include="Chess\Generator.h" />
     <ClInclude Include="Chess\Move.h" />
     <ClInclude Include="Chess\MoveGen.h" />
+    <ClInclude Include="Chess\MoveHelper.h" />
     <ClInclude Include="Chess\Parser.h" />
     <ClInclude Include="Chess\Piece.h" />
     <ClInclude Include="Chess\Square.h" />
     <ClInclude Include="Chess\ZobristKey.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="Game\BlockerGame.h" />
     <ClInclude Include="Game\Game.h" />
+    <ClInclude Include="Game\IGame.h" />
+    <ClInclude Include="Game\Player\IBlockerPlayer.h" />
     <ClInclude Include="Game\Player\IPlayer.h" />
+    <ClInclude Include="Players\HumanPlayer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -3,6 +3,7 @@
 #include "Square.h"
 
 #include <stdexcept>
+#include <array>
 
 struct CastleRights {
 private:
@@ -79,17 +80,19 @@ public:
 	}
 };
 
+#pragma pack(push, 1) // Ensure the struct is tightly packed
 struct Move {
+	uint8_t movedPiece;
+	uint8_t from;
+	uint8_t to;
+	uint8_t promotedToPieceType;
 	Square epSquare;
-	Square from;
-	Square to;
-	Piece movedPiece;
 	Piece capturedPiece;
 	CastleRights castleRightsLost; // k, q, K, Q
-	PieceType promotedToPieceType;
 	CastleMoves isCastle;
 
 	bool operator==(const Move& other) const {
 		return to == other.to && from == other.from && movedPiece == other.movedPiece && capturedPiece == other.capturedPiece && promotedToPieceType == other.promotedToPieceType && epSquare == other.epSquare && isCastle == other.isCastle && castleRightsLost == other.castleRightsLost;
 	}
 };
+#pragma pack(pop)
