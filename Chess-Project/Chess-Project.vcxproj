@@ -90,6 +90,7 @@
     <ClCompile Include="Chess\ZobristKey.cpp" />
     <ClCompile Include="Game\BlockerGame.cpp" />
     <ClCompile Include="Game\Game.cpp" />
+    <ClCompile Include="Players\CompuerPlayer.cpp" />
     <ClCompile Include="Players\HumanPlayer.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -143,6 +144,7 @@
     <ClInclude Include="Game\IGame.h" />
     <ClInclude Include="Game\Player\IBlockerPlayer.h" />
     <ClInclude Include="Game\Player\IPlayer.h" />
+    <ClInclude Include="Players\CompuerPlayer.h" />
     <ClInclude Include="Players\HumanPlayer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

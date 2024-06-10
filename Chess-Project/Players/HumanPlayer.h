@@ -9,15 +9,15 @@ class HumanPlayer :
     public IBlockerPlayer
 {
 private:
-    std::mutex m;
     std::condition_variable cv;
     Move toMake = NullMove;
     Square toMoveBlocker = -1;
-    Bitboard notAvailableSquares;
+    Bitboard notAvailableSquares = 0;
     PieceType triggerPromotion();
     std::vector<Move> legalMoves;
     Board board;
 public:
+    std::mutex m;
     std::atomic_bool move = false, blockerMove = false;
     HumanPlayer() = default;
     Move Think(Board bd) override;

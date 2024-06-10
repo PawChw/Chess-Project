@@ -10,11 +10,11 @@ using Zobrist = uint64_t;
 class ZobristKey
 {
 	static std::once_flag initFlag;
-	static std::array<std::array<Zobrist, 64>, 12> hashes;
-	static Zobrist blackToMove;
 	static void InitOnce();
 public:
 	static void Init();
+	static std::array<std::array<Zobrist, 64>, 12> hashes;
+	static Zobrist blackToMove;
 
 	static Zobrist Compute(std::array<Bitboard, 12> bitboards, bool isBlacksTurn);
 };

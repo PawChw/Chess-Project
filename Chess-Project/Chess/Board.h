@@ -37,6 +37,7 @@ public:
 	Board(std::string toParse);
 	Board(const Board& other) = default;
 	bool isWhiteToMove = true;
+	int ply_count = 0;
 	Square epSquare = -1,
 		whiteKing = 4,
 		blackKing = 60,
@@ -47,6 +48,7 @@ public:
 	void MoveBlocker(Square newBlockerSquare);
 	void ForceMakeMove(Move move);
 	void UndoMove();
+	Bitboard getPieceAttacks(Piece piece, Square square) const;
 	Bitboard getBitboard(PieceType pieceType) const;
 	Bitboard getBitboard(PieceType pieceType, Color color) const;
 	Bitboard getWhiteBitboard() const;
@@ -61,11 +63,11 @@ public:
 	bool isDraw();
 	bool isInCheck(bool whoIs) const;
 	bool isCheckMate();
-	Zobrist getZorbistKey();
+	Zobrist getZobristKey();
 	const std::array<Piece, 64>& GetBoard();
 
 	bool operator==(const Board& other) {
-		return compareArrays(board, other.board) && epSquare == other.epSquare && castleRights.at(0).at(0) == castleRights.at(0).at(0) && castleRights.at(1).at(1) == castleRights.at(1).at(1) && castleRights.at(0).at(1) == castleRights.at(0).at(1) && castleRights.at(1).at(0) == castleRights.at(1).at(0) && blockerSquare == blockerSquare && whiteKing == other.whiteKing && blackKing == other.blackKing && isWhiteToMove == other.isWhiteToMove && halfMoveClock == other.halfMoveClock;
+		return ply_count == other.ply_count && compareArrays(board, other.board) && epSquare == other.epSquare && castleRights.at(0).at(0) == castleRights.at(0).at(0) && castleRights.at(1).at(1) == castleRights.at(1).at(1) && castleRights.at(0).at(1) == castleRights.at(0).at(1) && castleRights.at(1).at(0) == castleRights.at(1).at(0) && blockerSquare == blockerSquare && whiteKing == other.whiteKing && blackKing == other.blackKing && isWhiteToMove == other.isWhiteToMove && halfMoveClock == other.halfMoveClock;
 	}
 
 	bool operator!=(const Board& other) {

@@ -16,6 +16,7 @@ namespace PieceUtils {
 	const static PieceType Rook = 4;
 	const static PieceType Queen = 5;
 	const static PieceType King = 6;
+	const static PieceType Blocker = 7;
 
 
 	Color inline getColor(Piece piece) noexcept {

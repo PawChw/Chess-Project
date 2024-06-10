@@ -18,6 +18,7 @@ void Board::MoveBlocker(Square newBlockerSquare)
     Bitboard bb = getAllPiecesBitboard();
     if(BitboardHelpers::getBit(bb, newBlockerSquare)) throw std::invalid_argument("Illegal blocker move");
     blockerSquare = newBlockerSquare;
+    legalMovesCache.clear();
 }
 
 void Board::ForceMakeMove(Move move)
@@ -77,8 +78,9 @@ void Board::ForceMakeMove(Move move)
     gameMoveHistory.push_back(move);
     if (getColor(move.movedPiece) == Black) fullMoveClock++;
     legalMovesCache.clear();
-    gameHistory.push_back(getZorbistKey());
+    gameHistory.push_back(getZobristKey());
     isWhiteToMove = !isWhiteToMove;
+    ply_count++;
 }
 
 void Board::UndoMove() {
@@ -130,6 +132,7 @@ void Board::UndoMove() {
     if (getColor(move.movedPiece) == Black) fullMoveClock--;
     legalMovesCache.clear();
     isWhiteToMove = !isWhiteToMove;
+    ply_count--;
 }
 
 void Board::ParseFEN(std::string FEN)
@@ -274,6 +277,12 @@ Bitboard Board::getBitboard(PieceType pieceType, Color color) const
     return bitboard;
 }
 
+Bitboard Board::getPieceAttacks(Piece piece, Square square) const
+{
+    bool isWhite = (getColor(piece) == White);
+    return GetPieceMoves(getPieceType(piece), square, (isWhite ? blackKing : whiteKing), getAllPiecesBitboard(), isWhite, epSquare, true);
+}
+
 Bitboard Board::getWhiteBitboard() const
 {
     Bitboard bitboard = 0;
@@ -312,6 +321,7 @@ Bitboard Board::getAllPiecesBitboard() const
 
 Piece Board::getPieceOnSquare(Square square) const
 {
+    if (square == blockerSquare) return Blocker;
     if (isValidSquare(square)) return board[square];
     return None;
 }
@@ -377,7 +387,7 @@ bool Board::isCheckMate()
     return isInCheck(isWhiteToMove) && GetLegalMoves().size() == 0;
 }
 
-Zobrist Board::getZorbistKey()
+Zobrist Board::getZobristKey()
 {
     Bitboard wb = getWhiteBitboard(), bb = getBlackBitboard(),
         p = getBitboard(Pawn), n = getBitboard(Knight), b = getBitboard(Bishop),

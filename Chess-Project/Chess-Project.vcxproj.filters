@@ -18,42 +18,93 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UI\GameLoop.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Chess\Board.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\Textures.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Chess\MoveGen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BitboardHelpers.cpp">
+    <ClCompile Include="Chess\Generator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Chess\MoveHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Chess\Parser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Chess\ZobristKey.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\BlockerGame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Players\CompuerPlayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Players\HumanPlayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="UI\GameLoop.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BoardView.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Chess\Board.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Chess\Pieces\Piece.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\Textures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Chess\MoveGen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BitboardHelpers.h">
+    <ClInclude Include="Chess.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Chess\BitboardHelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Chess\Generator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Chess\Move.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Chess\MoveHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Chess\Parser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Chess\Piece.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Chess\Square.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Chess\ZobristKey.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\BlockerGame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\IGame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Player\IBlockerPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Player\IPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Players\CompuerPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Players\HumanPlayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -94,5 +145,55 @@
     <Image Include="UI\Assets\Pieces\Default\wr.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Assets\Pieces\Default\bb.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Default\bk.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Default\bn.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Default\bp.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Default\bq.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Default\br.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Default\wb.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Default\wk.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Default\wn.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Default\wp.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Default\wq.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Default\wr.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="Assets\Sounds\Default\capture.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\Default\castle.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\Default\check.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\Default\move.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
   </ItemGroup>
 </Project>
