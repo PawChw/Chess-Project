@@ -64,15 +64,15 @@ std::vector<Move> Generator::GenerateLegalMoves()
 						move.castleRightsLost.set(static_cast<int>(movesFor), 1, true);
 				}
 				else if (i == Rook) {
-					if (board.castleRights[static_cast<int>(movesFor)][0] && move.from == ourKingSquare - 3)
+					if (board.castleRights[static_cast<int>(movesFor)][0] && move.from == ourKingSquare + 3)
 						move.castleRightsLost.set(static_cast<int>(movesFor), 0, true);
-					if (board.castleRights[static_cast<int>(movesFor)][1] && move.from == ourKingSquare + 4)
+					if (board.castleRights[static_cast<int>(movesFor)][1] && move.from == ourKingSquare - 4)
 						move.castleRightsLost.set(static_cast<int>(movesFor), 1, true);
 				}
-				if (move.capturedPiece == Rook) {
-					if (board.castleRights[static_cast<int>(!movesFor)][0] && move.to == enemyKingSquare - 3)
+				if (getPieceType(move.capturedPiece) == Rook) {
+					if (board.castleRights[static_cast<int>(!movesFor)][0] && move.to == enemyKingSquare + 3)
 						move.castleRightsLost.set(static_cast<int>(!movesFor), 0, true);
-					if (board.castleRights[static_cast<int>(!movesFor)][1] && move.to == enemyKingSquare + 4)
+					if (board.castleRights[static_cast<int>(!movesFor)][1] && move.to == enemyKingSquare - 4)
 						move.castleRightsLost.set(static_cast<int>(!movesFor), 1, true);
 				}
 

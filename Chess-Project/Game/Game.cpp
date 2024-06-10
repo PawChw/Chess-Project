@@ -1,11 +1,14 @@
 #include "Game.h"
 
-Game::Game(IPlayer& white, IPlayer& black) : bd(Board()), white(white), black(black)
+Game::Game(IPlayer& white, IPlayer& black) : bd(Board()), white(white), 
+	black(black)
 {
+	isGameOn = false;
 }
 
 GameTerminalState Game::StartGame()
 {
+	isGameOn = true;
 	Move candidate;
 	while (!(bd.isCheckMate() || bd.isDraw())) {
 		candidate = (bd.isWhiteToMove ? white : black).Think(bd);
@@ -13,16 +16,22 @@ GameTerminalState Game::StartGame()
 			bd.MakeMove(candidate);
 		}
 		catch (std::invalid_argument invalidMove) {
-			if (invalidMove.what() == "Illegal move")
-				return { bd.isWhiteToMove ? Winner::Black : Winner::White, Reason::IllegalMove };
+			if (invalidMove.what() == "Illegal move") {
+				rs.winner = (bd.isWhiteToMove ? Winner::Black : Winner::White);
+				rs.reason =  Reason::IllegalMove;
+				return rs;
+			}
 			else
 				throw invalidMove;
 		}
 	}
-	Reason rs = Reason::Repetition;
-	if (bd.isCheckMate()) rs = Reason::Checkmate;
-	else if (bd.is50MoveRule()) rs = Reason::FiftyMoveRule;
-	else if (bd.isInsufficientMaterial()) rs = Reason::InsufficientMaterial;
-	else if (bd.isSteelMate()) rs = Reason::SteelMate;
-	return { bd.isWhiteToMove ? Winner::Black : Winner::White, rs };
+	isGameOn = false;
+	if (bd.isCheckMate()) {
+		rs.reason = Reason::Checkmate;
+		rs.winner = bd.isWhiteToMove ? Winner::Black : Winner::White;
+	}
+	else if (bd.is50MoveRule()) rs.reason = Reason::FiftyMoveRule;
+	else if (bd.isInsufficientMaterial()) rs.reason = Reason::InsufficientMaterial;
+	else if (bd.isSteelMate()) rs.reason = Reason::SteelMate;
+	return rs;
 }

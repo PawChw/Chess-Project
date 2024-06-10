@@ -1,6 +1,6 @@
 #pragma once
 
-using Square = uint8_t;
+using Square = int8_t;
 using File = uint8_t;
 using Rank = uint8_t;
 
@@ -13,7 +13,7 @@ inline Rank GetRank(Square square) noexcept {
 }
 
 inline bool isValidSquare(Square square) noexcept {
-	return square < 64;
+	return square < 64 && square >= 0;
 }
 
 inline bool isValidSquare(File file, Rank rank) noexcept {

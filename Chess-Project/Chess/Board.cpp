@@ -5,7 +5,7 @@ void Board::MakeMove(Move move)
 {
     // Check if the move is legal
     if (legalMovesCache.empty()) GetLegalMoves();
-    if (isMoveInVector(legalMovesCache, move)) {
+    if (!isMoveInVector(legalMovesCache, move)) {
         throw std::invalid_argument("Illegal move");
     }
 
@@ -78,6 +78,7 @@ void Board::ForceMakeMove(Move move)
     if (getColor(move.movedPiece) == Black) fullMoveClock++;
     legalMovesCache.clear();
     gameHistory.push_back(getZorbistKey());
+    isWhiteToMove = !isWhiteToMove;
 }
 
 void Board::UndoMove() {
@@ -128,6 +129,7 @@ void Board::UndoMove() {
     gameHistory.pop_back();
     if (getColor(move.movedPiece) == Black) fullMoveClock--;
     legalMovesCache.clear();
+    isWhiteToMove = !isWhiteToMove;
 }
 
 void Board::ParseFEN(std::string FEN)
@@ -228,22 +230,22 @@ void Board::ParseFEN(std::string FEN)
 Board::Board()
 {
     ParseFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-    legalMovesCache.reset();
+    legalMovesCache.clear();
     ZobristKey::Init();
 }
 
 Board::Board(std::string toParse)
 {
     ParseFEN(toParse);
-    legalMovesCache.reset();
+    legalMovesCache.clear();
     ZobristKey::Init();
 }
 
-const std::shared_ptr<const std::vector<Move>> Board::GetLegalMoves()
+const std::vector<Move>& Board::GetLegalMoves()
 {
-    if (legalMovesCache == nullptr) {
+    if (legalMovesCache.empty()) {
         auto gen = Generator(*this);
-        legalMovesCache = std::make_shared<const std::vector<Move>>(gen.GenerateLegalMoves());
+        legalMovesCache = gen.GenerateLegalMoves();
     }
     return legalMovesCache;
 }
@@ -351,7 +353,7 @@ bool Board::is50MoveRule() const
 
 bool Board::isSteelMate()
 {
-    return !isInCheck(isWhiteToMove) && GetLegalMoves()->size() == 0;
+    return !isInCheck(isWhiteToMove) && GetLegalMoves().size() == 0;
 }
 
 bool Board::isRepetition()
@@ -372,7 +374,7 @@ bool Board::isInCheck(bool whoIs) const
 
 bool Board::isCheckMate()
 {
-    return isInCheck(isWhiteToMove) && GetLegalMoves()->size() == 0;
+    return isInCheck(isWhiteToMove) && GetLegalMoves().size() == 0;
 }
 
 Zobrist Board::getZorbistKey()

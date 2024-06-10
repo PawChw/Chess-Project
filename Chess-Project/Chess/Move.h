@@ -94,5 +94,11 @@ struct Move {
 	bool operator==(const Move& other) const {
 		return to == other.to && from == other.from && movedPiece == other.movedPiece && capturedPiece == other.capturedPiece && promotedToPieceType == other.promotedToPieceType && epSquare == other.epSquare && isCastle == other.isCastle && castleRightsLost == other.castleRightsLost;
 	}
+
+	bool operator!=(const Move& other) const {
+		return !(*this == other);
+	}
 };
 #pragma pack(pop)
+
+static const Move NullMove = { 0,0,0,0,0,0,CastleRights(),CastleMoves() };

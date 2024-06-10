@@ -20,7 +20,7 @@ int findMove(std::vector<Move> moves, Move toFind)
     Move* moves_ptr = moves.data();
     Move* resoult = quickSearch(moves_ptr, moves_ptr + moves.size(), toFind);
     if (resoult == nullptr) return -1;
-    return resoult - moves_ptr;
+    return static_cast<int>(resoult - moves_ptr);
 }
 
 bool isMoveInVector(std::vector<Move> moves, Move toFind)
