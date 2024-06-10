@@ -20,7 +20,7 @@ bool Generator::checkMove(Move& move) const
 	bool rs = tmpBoard.isInCheck(movesFor);
 	tmpBoard.UndoMove();
 	if (tmpBoard != board) {
-		std::cout << "Boards ain't same" << std::endl;
+		std::cout << "Boards ain't same" << (tmpBoard.epSquare != board.epSquare ? " is enPassaant" : " idk") << std::endl;
 	}
 	return !rs;
 }

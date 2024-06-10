@@ -11,7 +11,7 @@ inline Square parseSquare(char sq[3]) {
 
 int main() {
 	HumanPlayer p1;
-	ComputerPlayer p2(3);
+	ComputerPlayer p2(4);
 	BlockerGame game(p1, p2);
 	int ply_count = -1;
 	std::thread gameThread = std::thread(&BlockerGame::StartGame, &game);

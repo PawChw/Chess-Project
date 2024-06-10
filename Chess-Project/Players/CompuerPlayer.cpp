@@ -8,13 +8,13 @@ int ComputerPlayer::NegaMax(Board& bd, int alpha, int beta, int depth)
 	if (bd.isDraw()) return (staticEval < -2000 ? 1000 : -30);
 	auto zobrist = bd.getZobristKey();
 	auto& tt = transposition->at(mask & zobrist);
-	if (tt.hash == zobrist && tt.depth >= depth) {
+	auto moves = bd.GetLegalMoves();
+	if (tt.hash == zobrist && tt.depth >= depth && isMoveInVector(moves, tt.move)) {
 		if (tt.flag == 1) return tt.eval;
 		if (tt.flag == 2 && tt.eval >= beta) return tt.eval;
 		if (tt.flag == 3 && tt.eval <= alpha) return tt.eval;
 	}
 	if (depth == 0) return staticEval;
-	auto moves = bd.GetLegalMoves();
 	std::qsort(moves.data(), moves.size(), sizeof(Move),
 		[](void const* x, void const* y)->int {
 			Move mx = *static_cast<const Move*>(x),
@@ -97,6 +97,7 @@ Square ComputerPlayer::ThinkBlocker(Board bd)
 
 Move ComputerPlayer::Think(Board bd)
 {
+	bd.GetLegalMoves();
 	bd.blockerSquare = -1;
 	NegaMax(bd, Checkmate, -Checkmate, max_depth);
 	auto tt = transposition->at(bd.getZobristKey() & mask);
