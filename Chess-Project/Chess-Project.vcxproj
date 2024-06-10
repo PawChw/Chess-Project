@@ -82,21 +82,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BitboardHelpers.cpp" />
-    <ClCompile Include="Chess\Board.cpp" />
-    <ClCompile Include="Chess\MoveGen.cpp" />
-    <ClCompile Include="UI\GameLoop.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="UI\Textures.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="BitboardHelpers.h" />
-    <ClInclude Include="Chess\Board.h" />
-    <ClInclude Include="Chess\MoveGen.h" />
-    <ClInclude Include="Chess\Pieces\Piece.h" />
-    <ClInclude Include="UI\GameLoop.h" />
-    <ClInclude Include="BoardView.h" />
-    <ClInclude Include="UI\Textures.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="UI\Assets\Pieces\Default\bb.png" />
