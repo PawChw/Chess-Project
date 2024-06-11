@@ -29,7 +29,7 @@ void Board::ForceMakeMove(Move move)
 
     // Handle en passant capture
     if (move.epSquare == move.to && PieceUtils::getPieceType(move.movedPiece) == Pawn) {
-        board[GetFile(move.to) + GetRank(move.from)] = None;
+        board[getSquare(GetFile(move.to), GetRank(move.from))] = None;
     }
     // handle castling
     else if (move.isCastle.get(0)) {
@@ -88,7 +88,8 @@ void Board::UndoMove() {
     Move& move = gameMoveHistory.back();
     board[move.from] = move.movedPiece;
     if (move.to == move.epSquare && PieceUtils::getPieceType(move.movedPiece) == Pawn) {
-        board[GetFile(move.to) + GetRank(move.from)] = move.capturedPiece;
+        board[getSquare(GetFile(move.to), GetRank(move.from))] = move.capturedPiece;
+        board[move.to] = None;
     }
     else
         board[move.to] = move.capturedPiece;
@@ -387,7 +388,7 @@ bool Board::isCheckMate()
     return isInCheck(isWhiteToMove) && GetLegalMoves().size() == 0;
 }
 
-Zobrist Board::getZobristKey()
+Zobrist Board::getZobristKey() const
 {
     Bitboard wb = getWhiteBitboard(), bb = getBlackBitboard(),
         p = getBitboard(Pawn), n = getBitboard(Knight), b = getBitboard(Bishop),
@@ -408,7 +409,7 @@ Zobrist Board::getZobristKey()
         }, !isWhiteToMove);
 }
 
-const std::array<Piece, 64>& Board::GetBoard()
+const std::array<Piece, 64>& Board::GetBoard() const
 {
     return board;
 }

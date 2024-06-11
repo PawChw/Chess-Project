@@ -19,10 +19,11 @@ int main() {
 	char to[3] = { 0 };
 	std::cout << "Game start" << std::endl;
 	while (!game.isGameOn) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(33));
+		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	}
 	while (game.isGameOn)
 	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(33));
 		if (ply_count != game.bd.ply_count) {
 			ply_count = game.bd.ply_count;
 			{
@@ -65,7 +66,6 @@ int main() {
 				std::cin >> to;
 			} while (!p1.TryMoveBlocker(parseSquare(to)));
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(33));
 	}
 	gameThread.join();
 	

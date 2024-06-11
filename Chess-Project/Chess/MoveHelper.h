@@ -4,7 +4,7 @@
 #include<cstring>
 
 #include "Move.h"
-
+#include "Piece.h"
 
 
 int cmpMoves(const Move& m1, const Move& m2); /* REQUIREMENT

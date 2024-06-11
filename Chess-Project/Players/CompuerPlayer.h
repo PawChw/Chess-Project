@@ -22,6 +22,12 @@ private:
 	int Eval(Board& bd) const;
 	static const int Checkmate = 10000;
 	int PieceVals[King+1] = { 0, 100, 300, 330, 500, 1000, Checkmate };
+
+    int mgIncrement[7] = { 0,0,1,1,2,4,0 };
+
+    int mg_table[12][64];
+    int eg_table[12][64];
+
 public:
 	ComputerPlayer(uint8_t max_depth = 2);
 	Square ThinkBlocker(Board bd) override;

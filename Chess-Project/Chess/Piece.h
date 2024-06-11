@@ -30,4 +30,8 @@ namespace PieceUtils {
 		if (!(pieceType & 7)) return piece;
 		return (piece & 24) | (pieceType & 7);
 	}
+
+	Piece inline changeColor(Piece piece) {
+		return piece ^ (White|Black);
+	}
 };

@@ -20,7 +20,7 @@ bool Generator::checkMove(Move& move) const
 	bool rs = tmpBoard.isInCheck(movesFor);
 	tmpBoard.UndoMove();
 	if (tmpBoard != board) {
-		std::cout << "Boards ain't same" << (tmpBoard.epSquare != board.epSquare ? " is enPassaant" : " idk") << std::endl;
+		std::cout << "Boards ain't same" << (tmpBoard == board ? " is board" : " idk") << std::endl;
 	}
 	return !rs;
 }
@@ -54,6 +54,9 @@ std::vector<Move> Generator::GenerateLegalMoves()
 			while (static_cast<bool>(movesbb)) {
 				move.to = BitboardHelpers::getAndClearIndexOfLSB(movesbb);
 				move.capturedPiece = board.getPieceOnSquare(move.to);
+				if (board.epSquare == move.to && getPieceType(move.movedPiece) == Pawn) {
+					move.capturedPiece = changeColor(move.movedPiece);
+				}
 
 				//castle rights
 				move.castleRightsLost.set({ false, false, false, false });
@@ -104,7 +107,7 @@ std::vector<Move> Generator::GenerateLegalMoves()
 		&& !board.isSquareAttacked(ourKingSquare - 3, !movesFor)
 		&& !board.isSquareAttacked(ourKingSquare - 4, !movesFor)) {
 		move.to = ourKingSquare - 2;
-		move.isCastle.set(false, true);
+		move.isCastle.set({ false, true });
 		moves.push_back(move);
 	}
 	if (board.castleRights[static_cast<int>(movesFor)][0]
@@ -114,7 +117,7 @@ std::vector<Move> Generator::GenerateLegalMoves()
 		&& !board.isSquareAttacked(ourKingSquare + 2, !movesFor)
 		&& !board.isSquareAttacked(ourKingSquare + 3, !movesFor)) {
 		move.to = ourKingSquare + 2;
-		move.isCastle.set(true, false);
+		move.isCastle.set({ true, false });
 		moves.push_back(move);
 	}
 	return moves;

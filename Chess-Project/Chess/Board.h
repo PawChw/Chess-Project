@@ -63,14 +63,25 @@ public:
 	bool isDraw();
 	bool isInCheck(bool whoIs) const;
 	bool isCheckMate();
-	Zobrist getZobristKey();
-	const std::array<Piece, 64>& GetBoard();
+	Zobrist getZobristKey() const;
+	const std::array<Piece, 64>& GetBoard() const;
 
 	bool operator==(const Board& other) {
-		return ply_count == other.ply_count && compareArrays(board, other.board) && epSquare == other.epSquare && castleRights.at(0).at(0) == castleRights.at(0).at(0) && castleRights.at(1).at(1) == castleRights.at(1).at(1) && castleRights.at(0).at(1) == castleRights.at(0).at(1) && castleRights.at(1).at(0) == castleRights.at(1).at(0) && blockerSquare == blockerSquare && whiteKing == other.whiteKing && blackKing == other.blackKing && isWhiteToMove == other.isWhiteToMove && halfMoveClock == other.halfMoveClock;
+		auto rs = ply_count == other.ply_count;
+		rs &= compareArrays(board, other.board);
+		rs &= epSquare == other.epSquare;
+		rs &= compareArrays(castleRights.at(1), other.castleRights.at(1));
+		rs &= compareArrays(castleRights.at(0), other.castleRights.at(0));
+		rs &= blockerSquare == blockerSquare;
+		rs &= whiteKing == other.whiteKing;
+		rs &= blackKing == other.blackKing;
+		rs &= isWhiteToMove == other.isWhiteToMove;
+		rs &= halfMoveClock == other.halfMoveClock;
+		return rs;
 	}
 
 	bool operator!=(const Board& other) {
-		return !(*this == other);
+		auto rs = (*this == other);
+		return !rs;
 	}
 };
