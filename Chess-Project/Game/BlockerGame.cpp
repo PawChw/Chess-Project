@@ -5,6 +5,14 @@ black(black)
 {
 	isGameOn = false;
 	stateChanged = true;
+	if (!capture.loadFromFile("Assets/Sounds/Default/capture.wav"))
+		throw std::runtime_error("Capture audio not found");
+	if (!castle.loadFromFile("Assets/Sounds/Default/castle.wav"))
+		throw std::runtime_error("Castle audio not found");
+	if (!check.loadFromFile("Assets/Sounds/Default/check.wav"))
+		throw std::runtime_error("Check audio not found");
+	if (!move.loadFromFile("Assets/Sounds/Default/move.wav"))
+		throw std::runtime_error("Move audio not found");
 }
 
 GameTerminalState BlockerGame::StartGame()
@@ -56,6 +64,15 @@ GameTerminalState BlockerGame::StartGame()
 		candidate = (bd.isWhiteToMove ? white : black)->Think(bd);
 		try {
 			bd.MakeMove(candidate);
+			if (candidate.capturedPiece)
+				audioPlayer.setBuffer(capture);
+			else if (candidate.isCastle.toBool())
+				audioPlayer.setBuffer(castle);
+			else if (bd.isInCheck(bd.isWhiteToMove))
+				audioPlayer.setBuffer(check);
+			else
+				audioPlayer.setBuffer(move);
+			audioPlayer.play();
 			stateChanged = true;
 		}
 		catch (std::invalid_argument invalidMove) {
@@ -130,11 +147,7 @@ GameTerminalState BlockerGame::StartGame()
 
 GameTerminalState BlockerGame::RestartGame()
 {
-	{
-		auto& tmp = white;
-		white = black;
-		black = tmp;
-	}
+	std::swap(white, black);
 	player1isWhite = !player1isWhite;
 	bd = Board();
 	rs = GameTerminalState();

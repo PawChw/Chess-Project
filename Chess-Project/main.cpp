@@ -22,7 +22,7 @@ int main() {
 	std::string blackWinsString = "Player2 wins: 0";
 	std::string drawsString = "Draw: 0";
 	bool round = true;
-	BoardView board(sf::Vector2f(0, 0), std::min(size.y * 1.f, size.x * 2.f / 3), Players::HumanPlayer, Players::ComputerPlayer, true);
+	BoardView board(sf::Vector2f(0, 0), std::min(size.y * 1.f, size.x * 2.f / 3), Players::HumanPlayer, Players::ComputerPlayer, false);
 	font.loadFromFile("Assets/Roboto-Regular.ttf");
 	window.setFramerateLimit(30);
 	whites.setPosition(sf::Vector2f{ size.x * 2.f / 3 + 100, 150 });
