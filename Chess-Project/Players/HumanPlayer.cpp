@@ -12,13 +12,6 @@ Move HumanPlayer::Think(Board bd) {
 	legalMoves = bd.GetLegalMoves();
 	toMake = NullMove;
 	toMoveBlocker = -1;
-	std::cout << "Available moves";
-	for (auto& mv : legalMoves) {
-		auto fromFile = GetFile(mv.from), fromRank = GetRank(mv.from);
-		auto toFile = GetFile(mv.to), toRank = GetRank(mv.to);
-		std::cout << '\n' << static_cast<char>('a'+fromFile) << static_cast<char>('1' + fromRank) << '\t' << static_cast<char>('a' + toFile) << static_cast<char>('1' + toRank);
-	}
-	std::cout <<  std::endl;
 	move = true;
 	cv.wait(lk, [this] {return toMake != NullMove; });
 	legalMoves.clear();
@@ -34,7 +27,7 @@ bool HumanPlayer::TryMove(Square from, Square to) {
 	candidate.from = from;
 	candidate.to = to;
 	int index;
-	if (getPieceType(candidate.movedPiece) == Pawn && GetRank(to) == (getColor(candidate.movedPiece) == White ? 7 : 0)) {
+	if (getPieceType(candidate.movedPiece) == Pawn && GetRank(to) == (getColor(candidate.movedPiece) == White ? 0 : 7)) {
 		candidate.promotedToPieceType = Queen;
 	}
 	index = findMove(legalMoves, candidate);
@@ -58,13 +51,6 @@ Square HumanPlayer::ThinkBlocker(Board bd) {
 	notAvailableSquares = bd.getAllPiecesBitboard();
 	BitboardHelpers::setBit(notAvailableSquares, bd.blockerSquare);
 	Bitboard av = ~notAvailableSquares;
-	std::cout << "Available blocks";
-	while (av) {
-		int index = BitboardHelpers::getAndClearIndexOfLSB(av);
-		auto toFile = GetFile(index), toRank = GetRank(index);
-		std::cout << '\n' << static_cast<char>('a' + toFile) << static_cast<char>('1' + toRank);
-	}
-	std::cout << std::endl;
 	blockerMove = true;
 	cv.wait(lk, [this] {return toMoveBlocker != -1; });
 	lk.unlock();

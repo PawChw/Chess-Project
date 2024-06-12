@@ -48,6 +48,9 @@
     <ClCompile Include="Players\HumanPlayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UI\BoardView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Chess\Board.h">
@@ -105,6 +108,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Players\HumanPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\BoardView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -179,6 +188,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="Assets\Pieces\Default\wr.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Board.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

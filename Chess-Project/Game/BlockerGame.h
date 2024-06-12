@@ -5,10 +5,10 @@
 
 class BlockerGame : public IGame {
 public:
-	Board bd;
-	IBlockerPlayer& white;
-	IBlockerPlayer& black;
+	std::shared_ptr<IBlockerPlayer> white;
+	std::shared_ptr<IBlockerPlayer> black;
 	BlockerGame() = delete;
-	BlockerGame(IBlockerPlayer& white, IBlockerPlayer& black);
+	BlockerGame(std::shared_ptr<IBlockerPlayer> white, std::shared_ptr<IBlockerPlayer> black);
 	GameTerminalState StartGame() override;
+	GameTerminalState RestartGame() override;
 };

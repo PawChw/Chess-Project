@@ -3,7 +3,7 @@
 #include<vector>
 #include<stdexcept>
 
-using Bitboard = int64_t;
+using Bitboard = uint64_t;
 
 class BitboardHelpers
 {
@@ -36,6 +36,21 @@ public:
         if (!bb) throw std::invalid_argument("Board is empty");
         unsigned long index;
         _BitScanForward64(&index, bb);
+        clearBit(bb, index);
+        return static_cast<unsigned int>(index);
+    }
+
+    static inline unsigned int getIndexOfFSB(Bitboard& bb) {
+        if (!bb) throw std::invalid_argument("Board is empty");
+        unsigned long index;
+        _BitScanReverse64(&index, bb);
+        return static_cast<unsigned int>(index);
+    }
+
+    static inline unsigned int getAndClearIndexOfFSB(Bitboard& bb) {
+        if (!bb) throw std::invalid_argument("Board is empty");
+        unsigned long index;
+        _BitScanReverse64(&index, bb);
         clearBit(bb, index);
         return static_cast<unsigned int>(index);
     }

@@ -1,11 +1,15 @@
 #include "Board.h"
 #include "Generator.h"
+#include "Board.h"
+#include "Board.h"
 
 void Board::MakeMove(Move move)
 {
     // Check if the move is legal
     if (legalMovesCache.empty()) GetLegalMoves();
     if (!isMoveInVector(legalMovesCache, move)) {
+        int i = 0;
+        isMoveInVector(legalMovesCache, move);
         throw std::invalid_argument("Illegal move");
     }
 
@@ -76,9 +80,10 @@ void Board::ForceMakeMove(Move move)
 
 
     gameMoveHistory.push_back(move);
+    gameHistory.push_back(currHash);
     if (getColor(move.movedPiece) == Black) fullMoveClock++;
     legalMovesCache.clear();
-    gameHistory.push_back(getZobristKey());
+    ZobristKey::Move(currHash, move.from, move.to, move.movedPiece);
     isWhiteToMove = !isWhiteToMove;
     ply_count++;
 }
@@ -127,13 +132,19 @@ void Board::UndoMove() {
     else {
         halfMoveClock--;
     }
-
     gameMoveHistory.pop_back();
-    gameHistory.pop_back();
+    if (gameHistory.empty()) {
+        ZobristKey::Move(currHash, move.from, move.to, move.movedPiece);
+    }
+    else {
+        currHash = gameHistory.back();
+        gameHistory.pop_back();
+    }
     if (getColor(move.movedPiece) == Black) fullMoveClock--;
     legalMovesCache.clear();
     isWhiteToMove = !isWhiteToMove;
     ply_count--;
+
 }
 
 void Board::ParseFEN(std::string FEN)
@@ -142,21 +153,32 @@ void Board::ParseFEN(std::string FEN)
     auto ps = Parser(FEN);
     char val;
     while (!ps.finished() && i < 64) {
-        auto in = i % 8 + (8 * (7 - i / 8));
         val = ps.consume();
         switch (val) {
-        case 'K': board[in] = White | King; i++; whiteKing = in; break;
-        case 'Q': board[in] = White | Queen; i++; break;
-        case 'R': board[in] = White | Rook; i++; break;
-        case 'B': board[in] = White | Bishop; i++; break;
-        case 'N': board[in] = White | Knight; i++; break;
-        case 'P': board[in] = White | Pawn; i++; break;
-        case 'k': board[in] = Black | King; i++; blackKing = in; break;
-        case 'q': board[in] = Black | Queen; i++; break;
-        case 'r': board[in] = Black | Rook; i++; break;
-        case 'b': board[in] = Black | Bishop; i++; break;
-        case 'n': board[in] = Black | Knight; i++; break;
-        case 'p': board[in] = Black | Pawn; i++; break;
+        case 'K': 
+            board[i] = White | King; whiteKing = i; i++; break;
+        case 'Q': 
+            board[i] = White | Queen; i++; break;
+        case 'R': 
+            board[i] = White | Rook; i++; break;
+        case 'B': 
+            board[i] = White | Bishop; i++; break;
+        case 'N': 
+            board[i] = White | Knight; i++; break;
+        case 'P':
+            board[i] = White | Pawn; i++; break;
+        case 'k': 
+            board[i] = Black | King; blackKing = i; i++; break;
+        case 'q': 
+            board[i] = Black | Queen; i++; break;
+        case 'r': 
+            board[i] = Black | Rook; i++; break;
+        case 'b': 
+            board[i] = Black | Bishop; i++; break;
+        case 'n': 
+            board[i] = Black | Knight; i++; break;
+        case 'p': 
+            board[i] = Black | Pawn; i++; break;
         case '1':
         case '2':
         case '3':
@@ -236,6 +258,23 @@ Board::Board()
     ParseFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     legalMovesCache.clear();
     ZobristKey::Init();
+    Bitboard wb = getWhiteBitboard(), bb = getBlackBitboard(),
+        p = getBitboard(Pawn), n = getBitboard(Knight), b = getBitboard(Bishop),
+        r = getBitboard(Rook), q = getBitboard(Queen), k = getBitboard(King);
+    currHash = ZobristKey::Compute({
+        wb & p,
+        wb & n,
+        wb & b,
+        wb & r,
+        wb & q,
+        wb & k,
+        bb & p,
+        bb & n,
+        bb & b,
+        bb & r,
+        bb & q,
+        bb & k,
+        }, !isWhiteToMove);
 }
 
 Board::Board(std::string toParse)
@@ -243,6 +282,23 @@ Board::Board(std::string toParse)
     ParseFEN(toParse);
     legalMovesCache.clear();
     ZobristKey::Init();
+    Bitboard wb = getWhiteBitboard(), bb = getBlackBitboard(),
+        p = getBitboard(Pawn), n = getBitboard(Knight), b = getBitboard(Bishop),
+        r = getBitboard(Rook), q = getBitboard(Queen), k = getBitboard(King);
+    currHash = ZobristKey::Compute({
+        wb & p,
+        wb & n,
+        wb & b,
+        wb & r,
+        wb & q,
+        wb & k,
+        bb & p,
+        bb & n,
+        bb & b,
+        bb & r,
+        bb & q,
+        bb & k,
+        }, !isWhiteToMove);
 }
 
 const std::vector<Move>& Board::GetLegalMoves()
@@ -369,7 +425,13 @@ bool Board::isSteelMate()
 
 bool Board::isRepetition()
 {
-    return false;
+    int count = 0;
+    for (int i = gameHistory.size() - halfMoveClock; i < gameHistory.size(); i++) {
+        if (gameHistory[i] == currHash) {
+            count++;
+        }
+    }
+    return count > 1;
 }
 
 bool Board::isDraw()
@@ -390,23 +452,7 @@ bool Board::isCheckMate()
 
 Zobrist Board::getZobristKey() const
 {
-    Bitboard wb = getWhiteBitboard(), bb = getBlackBitboard(),
-        p = getBitboard(Pawn), n = getBitboard(Knight), b = getBitboard(Bishop),
-        r = getBitboard(Rook), q = getBitboard(Queen), k = getBitboard(King);
-    return ZobristKey::Compute({
-        wb & p,
-        wb & n,
-        wb & b,
-        wb & r,
-        wb & q,
-        wb & k,
-        bb & p,
-        bb & n,
-        bb & b,
-        bb & r,
-        bb & q,
-        bb & k,
-        }, !isWhiteToMove);
+    return currHash;
 }
 
 const std::array<Piece, 64>& Board::GetBoard() const

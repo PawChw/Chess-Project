@@ -30,3 +30,19 @@ Zobrist ZobristKey::Compute(std::array<Bitboard, 12> bitboards, bool isBlacksTur
 	}
 	return value;
 }
+
+Zobrist ZobristKey::GetMove(Square from, Square to, Piece piece, Zobrist old, bool changeMover)
+{
+	Zobrist newZobrist = old;
+	Move(newZobrist, from, to, piece, changeMover);
+	return newZobrist;
+}
+
+void ZobristKey::Move(Zobrist& old, Square from, Square to, Piece piece, bool changeMover)
+{
+	int pieceIndex = PieceUtils::getPieceType(piece) - 1;
+	if (PieceUtils::getColor(piece) == PieceUtils::Black) pieceIndex += 6;
+	if (changeMover) old ^= blackToMove;
+	old ^= hashes[pieceIndex][from];
+	old ^= hashes[pieceIndex][to];
+}

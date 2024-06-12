@@ -7,10 +7,10 @@
 
 class Game : public IGame {
 public:
-	Board bd;
-	IPlayer& white;
-	IPlayer& black;
+	std::shared_ptr<IPlayer> white;
+	std::shared_ptr<IPlayer> black;
 	Game() = delete;
-	Game(IPlayer& white, IPlayer& black);
+	Game(std::shared_ptr<IPlayer> white, std::shared_ptr<IPlayer> black);
 	GameTerminalState StartGame() override;
+	GameTerminalState RestartGame() override;
 };

@@ -96,13 +96,13 @@ Bitboard GetPawnMoves(Square square, Bitboard blockers, bool isWhite, Square epS
 Bitboard GetPawnSilentMoves(Square square, Bitboard blockers, bool isWhite)
 {
 	Bitboard possibleMoves = 0ull;
-	int8_t direction = isWhite ? 1 : -1;
+	int8_t direction = isWhite ? -1 : 1;
 	Coords startPos = Coords::fromSquareIndex(square);
 	Coords temp = startPos;
 	temp.rank += direction;
 	if (temp.isValid() && !BitboardHelpers::getBit(blockers, temp.toSquareIndex())) {
 		BitboardHelpers::setBit(possibleMoves, temp.toSquareIndex());
-		if (startPos.rank == (isWhite ? 1 : 6)) {
+		if (startPos.rank == (isWhite ? 6 : 1)) {
 			temp.rank += direction;
 			if (temp.isValid() && !BitboardHelpers::getBit(blockers, temp.toSquareIndex()))
 				BitboardHelpers::setBit(possibleMoves, temp.toSquareIndex());
@@ -115,7 +115,7 @@ Bitboard GetPawnSilentMoves(Square square, Bitboard blockers, bool isWhite)
 Bitboard GetPawnAttacks(Square square, bool isWhite)
 {
 	Bitboard possibleAttacks = 0ull;
-	int8_t direction = isWhite ? 1 : -1;
+	int8_t direction = isWhite ? -1 : 1;
 	Coords startPos = Coords::fromSquareIndex(square);
 	Coords temp = startPos;
 	temp.rank += direction;

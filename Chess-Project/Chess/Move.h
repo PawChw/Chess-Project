@@ -78,6 +78,10 @@ public:
 	bool operator==(const CastleMoves& other) const {
 		return other.moves == moves;
 	}
+
+	bool toBool() const {
+		return static_cast<bool>(moves);
+	}
 };
 
 #pragma pack(push, 1) // Ensure the struct is tightly packed

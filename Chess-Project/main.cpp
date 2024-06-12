@@ -2,90 +2,125 @@
 #include<thread>
 #include<chrono>
 #include "Game.h"
-#include "Players/HumanPlayer.h"
-#include "Players//CompuerPlayer.h"
-
-inline Square parseSquare(char sq[3]) {
-	return ((sq[1] - '1') << 3) + sq[0] - 'a';
-}
+#include <SFML/Graphics.hpp>
+#include "UI/BoardView.h"
+#include "Chess.h"
+#include <string>
+#include <algorithm>
+#include <Windows.h>
 
 int main() {
-	HumanPlayer p1;
-	ComputerPlayer p2(4);
-	BlockerGame game(p1, p2);
-	int ply_count = -1;
-	std::thread gameThread = std::thread(&BlockerGame::StartGame, &game);
-	char from[3] = { 0 };
-	char to[3] = { 0 };
-	std::cout << "Game start" << std::endl;
-	while (!game.isGameOn) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(50));
-	}
-	while (game.isGameOn)
-	{
+	sf::RenderWindow window(sf::VideoMode(1200, 800), "Chess");
+	sf::Vector2u size = window.getSize();
+	sf::Text whites;
+	sf::Text blacks;
+	sf::Text draws;
+	sf::Font font;
+	sf::Text player1;
+	sf::Text player2;
+	std::string whiteWinsString = "Player1 wins: 0";
+	std::string blackWinsString = "Player2 wins: 0";
+	std::string drawsString = "Draw: 0";
+	bool round = true;
+	BoardView board(sf::Vector2f(0, 0), std::min(size.y * 1.f, size.x * 2.f / 3), Players::HumanPlayer, Players::ComputerPlayer, true);
+	font.loadFromFile("Assets/Roboto-Regular.ttf");
+	window.setFramerateLimit(30);
+	whites.setPosition(sf::Vector2f{ size.x * 2.f / 3 + 100, 150 });
+	whites.setCharacterSize(20);
+	whites.setString(whiteWinsString);
+	whites.setFont(font);
+	blacks.setPosition(sf::Vector2f{ size.x * 2.f / 3 + 100, 200 });
+	blacks.setCharacterSize(20);
+	blacks.setFont(font);
+	blacks.setString(blackWinsString);
+	draws.setPosition(sf::Vector2f{ size.x * 2.f / 3 + 100, 250 });
+	draws.setCharacterSize(20);
+	draws.setFont(font);
+	draws.setString(drawsString);
+	player1.setPosition(sf::Vector2f{ size.x * 2.f / 3 + 20, 50 });
+	player1.setCharacterSize(20);
+	player1.setFont(font);
+	player1.setString("Player1");
+	player2.setPosition(sf::Vector2f{ size.x * 2.f / 3 + 20, 700 });
+	player2.setCharacterSize(20);
+	player2.setFont(font);
+	player2.setString("Player2");
+	bool update = true;
+	std::thread gameThread(&IGame::StartGame, board.game.get());
+	while (!board.game->isGameOn) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(33));
-		if (ply_count != game.bd.ply_count) {
-			ply_count = game.bd.ply_count;
+	}
+	while (window.isOpen()) {
+		sf::Event e;
+		while (window.pollEvent(e)) {
+			update = true;
+			switch (e.type)
 			{
-				std::unique_lock lk(p1.m);
-				for (Square sq = 0; sq < 64; sq++) {
-					Square sq1 = (8 * (7 - sq / 8)) + sq % 8;
-					if (sq % 8 == 0)
-						std::cout << '\n';
-					switch (game.bd.getPieceOnSquare(sq1))
-					{
-					case White | Pawn: std::cout << 'P'; break;
-					case White | Knight: std::cout << 'N'; break;
-					case White | Bishop: std::cout << 'B'; break;
-					case White | Rook: std::cout << 'R'; break;
-					case White | Queen: std::cout << 'Q'; break;
-					case White | King: std::cout << 'K'; break;
-					case Black | Pawn: std::cout << 'p'; break;
-					case Black | Knight: std::cout << 'n'; break;
-					case Black | Bishop: std::cout << 'b'; break;
-					case Black | Rook: std::cout << 'r'; break;
-					case Black | Queen: std::cout << 'q'; break;
-					case Black | King: std::cout << 'k'; break;
-					case Blocker: std::cout << 'X'; break;
-					default:std::cout << '.'; break;
-					}
-				}
-				std::cout << std::endl;
+			case sf::Event::Closed:
+				window.close();
+				break;
+			case sf::Event::MouseMoved:
+				board.HandleMouseMove(e.mouseMove, window);
+				break;
+			case sf::Event::MouseButtonPressed:
+				board.HandleMousePress(e.mouseButton, window);
+				break;
+			case sf::Event::MouseButtonReleased:
+				board.HandleMouseRealease(e.mouseButton, window);
+				break;
+			case sf::Event::Resized:
+				window.setSize(sf::Vector2u{ 1200, 800 });
+				break;
+			default:
+				break;
 			}
 		}
-		if (p1.move) {
-			std::cout << (game.bd.isWhiteToMove ? "White" : "Black") << " to move" << std::endl;
-			do {
-				std::cin >> from;
-				std::cin >> to;
-			} while (!p1.TryMove(parseSquare(from), parseSquare(to)));
+		if (!update && !board.game->stateChanged) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(33));
+			continue;
 		}
-		else if (p1.blockerMove) {
-			std::cout << (!game.bd.isWhiteToMove ? "White" : "Black") << " to move blocker" << std::endl;
-			do {
-				std::cin >> to;
-			} while (!p1.TryMoveBlocker(parseSquare(to)));
+		board.Update();
+		window.clear();
+		//re-render
+		window.draw(board);
+		window.draw(draws);
+		window.draw(whites);
+		window.draw(blacks);
+		window.draw(player1);
+		window.draw(player2);
+		window.display();
+		update = false;
+		if (!board.game->isGameOn) {
+			if (gameThread.joinable())
+				gameThread.join();
+			auto rs = board.game->rs.winner;
+			gameThread = std::thread(&IGame::RestartGame, board.game.get());
+			while (!board.game->isGameOn) {
+				std::this_thread::sleep_for(std::chrono::milliseconds(33));
+			}
+			whiteWinsString = whiteWinsString.substr(0, 14) + std::to_string(board.game->player1);
+			blackWinsString = blackWinsString.substr(0, 14) + std::to_string(board.game->player2);
+			drawsString = drawsString.substr(0, 6) + std::to_string(board.game->draw);
+			if (round) {
+				player2.setPosition(sf::Vector2f{ size.x * 2.f / 3 + 20, 50 });
+				player1.setPosition(sf::Vector2f{ size.x * 2.f / 3 + 20, 700 });
+			}
+			else {
+				player1.setPosition(sf::Vector2f{ size.x * 2.f / 3 + 20, 50 });
+				player2.setPosition(sf::Vector2f{ size.x * 2.f / 3 + 20, 700 });
+			}
+			round = !round;
+			whites.setString(whiteWinsString);
+			blacks.setString(blackWinsString);
+			draws.setString(drawsString);
+			update = true;
 		}
 	}
-	gameThread.join();
-	
-	if (game.rs.winner == Winner::White)
-		std::cout << "White wins ";
-	else if (game.rs.winner == Winner::Black)
-		std::cout << "White wins ";
-	else
-		std::cout << "Draw ";
-
-	if (game.rs.reason == Reason::Checkmate)
-		std::cout << "by checkmate!";
-	else if(game.rs.reason == Reason::IllegalMove)
-		std::cout << "because enemy made Illegal Move!";
-	else if (game.rs.reason == Reason::Repetition)
-		std::cout << "due to repetition!";
-	else if (game.rs.reason == Reason::FiftyMoveRule)
-		std::cout << "due to 50 move rule!";
-	else if (game.rs.reason == Reason::InsufficientMaterial)
-		std::cout << "due to insufficient material!";
-	else if (game.rs.reason == Reason::SteelMate)
-		std::cout << "due to steelmate!";
+	auto handle = gameThread.native_handle();
+	if (handle) {
+		if (!TerminateThread(handle, 1))
+			throw std::runtime_error("Failed to terminate thread");
+	}
+	if (gameThread.joinable())
+		gameThread.join();
 }

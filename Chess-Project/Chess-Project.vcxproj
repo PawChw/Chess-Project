@@ -93,8 +93,10 @@
     <ClCompile Include="Players\CompuerPlayer.cpp" />
     <ClCompile Include="Players\HumanPlayer.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="UI\BoardView.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Assets\Board.png" />
     <Image Include="Assets\Pieces\Default\bb.png" />
     <Image Include="Assets\Pieces\Default\bk.png" />
     <Image Include="Assets\Pieces\Default\bn.png" />
@@ -146,6 +148,8 @@
     <ClInclude Include="Game\Player\IPlayer.h" />
     <ClInclude Include="Players\CompuerPlayer.h" />
     <ClInclude Include="Players\HumanPlayer.h" />
+    <ClInclude Include="UI\BoardView.h" />
+    <ClInclude Include="Player.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

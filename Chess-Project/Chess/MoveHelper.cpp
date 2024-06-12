@@ -7,12 +7,14 @@ int cmpMoves(const Move& m1, const Move& m2)
 }
 
 Move* quickNonCastleSearch(Move* begin, Move* end, Move toFind) {
-    if (end <= begin) return nullptr;
-    Move* half = begin + (end - begin) / 2;
-    int diff = cmpMoves(toFind, *half);
-    if (diff == 0) return half;
-    else if (diff > 0) return quickNonCastleSearch(half + 1, end, toFind);
-    return quickNonCastleSearch(begin, half, toFind);
+    while (begin < end) {
+        Move* half = begin + (end - begin) / 2;
+        int diff = cmpMoves(toFind, *half);
+        if (diff == 0) return half;
+        else if (diff > 0) begin = half + 1;
+        else end = half;
+    }
+    return nullptr;
 }
 
 Move* quickSearchCastle(Move* begin, Move* end, Move toFind) {
@@ -22,7 +24,7 @@ Move* quickSearchCastle(Move* begin, Move* end, Move toFind) {
 }
 
 Move* quickSearch(Move* begin, Move* end, Move toFind) {
-    if(PieceUtils::getPieceType(toFind.movedPiece)==PieceUtils::King && std::abs(toFind.from - toFind.to)) return quickSearchCastle(begin, end, toFind);
+    if(PieceUtils::getPieceType(toFind.movedPiece)==PieceUtils::King && std::abs(toFind.from - toFind.to)==2) return quickSearchCastle(begin, end, toFind);
     return quickNonCastleSearch(begin, end, toFind);
 }
 

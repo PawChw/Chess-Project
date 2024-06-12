@@ -27,6 +27,7 @@ private:
 	std::vector<Move> legalMovesCache;
 	std::vector<Move> gameMoveHistory;
 	std::vector<Zobrist> gameHistory;
+	Zobrist currHash = 0;
 	std::vector<unsigned int> historicHalfMoves;
 	unsigned int halfMoveClock = 0;
 	unsigned int fullMoveClock = 0;

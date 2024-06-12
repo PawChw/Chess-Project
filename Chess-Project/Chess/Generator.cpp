@@ -18,10 +18,6 @@ bool Generator::checkMove(Move& move) const
 	Board tmpBoard = board;
 	tmpBoard.ForceMakeMove(move);
 	bool rs = tmpBoard.isInCheck(movesFor);
-	tmpBoard.UndoMove();
-	if (tmpBoard != board) {
-		std::cout << "Boards ain't same" << (tmpBoard == board ? " is board" : " idk") << std::endl;
-	}
 	return !rs;
 }
 
@@ -37,7 +33,7 @@ Generator::Generator(const Board& board, bool movesFor) : board(board), movesFor
 
 std::vector<Move> Generator::GenerateLegalMoves()
 {
-	const static std::array< std::array<Bitboard, 2>, 2> castleChecks = { { {6917529027641081856ull, 1008806316530991104ull}, {96ull, 14ull}} }; // K, Q, k, q
+	const static std::array< std::array<Bitboard, 2>, 2> castleChecks = { { {96ull, 14ull}, {6917529027641081856ull, 1008806316530991104ull}} }; // K, Q, k, q
 	std::vector<Move> moves;
 	Bitboard tmp, movesbb, notOurBB = ~(bitboards[static_cast<int>(movesFor)][0]);
 	Square ourKingSquare = movesFor ? board.whiteKing : board.blackKing, enemyKingSquare = movesFor ? board.blackKing : board.whiteKing;
@@ -80,7 +76,7 @@ std::vector<Move> Generator::GenerateLegalMoves()
 				}
 
 				//promotion check
-				if (i == Pawn && GetRank(move.to) == (movesFor ? 7 : 0)) {
+				if (i == Pawn && GetRank(move.to) == (movesFor ? 0 : 7)) {
 					for (PieceType j = Knight; j < King; j++) {
 						move.promotedToPieceType = j;
 						if (checkMove(move))
