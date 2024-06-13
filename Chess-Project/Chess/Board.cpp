@@ -397,7 +397,8 @@ bool Board::isSquareAttacked(Square square, bool byWho) const
 
 bool Board::isInsufficientMaterial()
 {
-    if (!static_cast<bool>(getBitboard(Pawn))) return false;
+    if (static_cast<bool>(getBitboard(Pawn))) 
+        return false;
     auto wb = getWhiteBitboard();
     auto bb = getBlackBitboard();
     auto K = getBitboard(Knight);
@@ -424,7 +425,7 @@ bool Board::isSteelMate()
     Bitboard myBB = isWhiteToMove ? getWhiteBitboard() : getBlackBitboard(),
         myPawns = getBitboard(Pawn, isWhiteToMove ? White : Black);
     BitboardHelpers::clearBit(myBB, isWhiteToMove ? whiteKing : blackKing);
-    if (myPawns ^ myBB) return false;
+    if ((myPawns ^ myBB) & 4359202964317896252ull) return false; //magic bitboard to prevent stuck in corner in blocker games
     return GetLegalMoves().size() == 0;
 }
 
