@@ -28,7 +28,7 @@ private:
 	sf::Texture boardTexture;
 	std::vector<MovesToDraw> legalMoves;
 	std::unique_ptr<std::vector<sf::RectangleShape>> pieces = std::make_unique<std::vector<sf::RectangleShape>>();
-	std::unique_ptr<std::vector<sf::RectangleShape>> moves = std::make_unique<std::vector<sf::RectangleShape>>();
+	std::unique_ptr<std::vector<sf::CircleShape>> moves = std::make_unique<std::vector<sf::CircleShape>>();
 	sf::Vector2f pos;
 	bool selectedChanged = true;
 	bool sizeOrPosChanged = true;
@@ -49,6 +49,7 @@ private:
 	static sf::Texture blackQueen;
 	static sf::Texture whiteKing;
 	static sf::Texture blackKing;
+	static sf::Texture duck;
 	static std::atomic_bool texturesLoaded;
 	static void loadTextures();
 

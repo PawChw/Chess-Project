@@ -10,7 +10,7 @@
 #include "../Chess.h"
 
 enum class transpositionFlag : uint8_t {
-    EXACT, UPPERBOUND, LOWERBOUND
+    NONE = 0,EXACT, UPPERBOUND, LOWERBOUND
 };
 
 struct MoveEval {
@@ -25,7 +25,7 @@ using Clock = std::chrono::system_clock::duration;
 
 class ComputerPlayer : public IBlockerPlayer {
 private:
-	static const Zobrist mask = 0xFFFFFF;
+	static const Zobrist mask = 0x7FFFFF;
 	std::unique_ptr< std::array<MoveEval, mask + 1>> transposition = std::make_unique< std::array<MoveEval, mask + 1>>();
 	uint8_t max_depth;
 	int NegaMax(Board& bd, int alpha, int beta, int depth);

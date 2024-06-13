@@ -22,30 +22,26 @@ GameTerminalState Game::StartGame()
 			stateChanged = true;
 		}
 		catch (std::invalid_argument invalidMove) {
-			if (invalidMove.what() == "Illegal move") {
-				if (bd.isWhiteToMove) {
-					if (!player1isWhite) {
-						player1++;
-					}
-					else {
-						player2++;
-					}
-					rs.winner = Winner::Black;
+			if (bd.isWhiteToMove) {
+				if (!player1isWhite) {
+					player1++;
 				}
 				else {
-					if (player1isWhite) {
-						player1++;
-					}
-					else {
-						player2++;
-					}
-					rs.winner = Winner::White;
+					player2++;
 				}
-				rs.reason =  Reason::IllegalMove;
-				return rs;
+				rs.winner = Winner::Black;
 			}
-			else
-				throw invalidMove;
+			else {
+				if (player1isWhite) {
+					player1++;
+				}
+				else {
+					player2++;
+				}
+				rs.winner = Winner::White;
+			}
+			rs.reason =  Reason::IllegalMove;
+			return rs;
 		}
 	}
 	isGameOn = false;

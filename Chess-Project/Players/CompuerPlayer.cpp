@@ -125,7 +125,7 @@ int ComputerPlayer::NegaMax(Board& bd, int alpha, int beta, int depth)
 {
     int bestVal = -Checkmate, val;
     if (depth == 0) return quiesce(bd, alpha, beta);
-    if (bd.isCheckMate()) return -Checkmate + bd.ply_count;
+    if (bd.isCheckMate()) return -Checkmate - bd.ply_count;
     if (bd.isDraw()) {
         val = Eval(bd);
         if (val < -1000) return 100;
@@ -139,17 +139,21 @@ int ComputerPlayer::NegaMax(Board& bd, int alpha, int beta, int depth)
         if (tt.flag == transpositionFlag::UPPERBOUND && tt.eval >= beta) return tt.eval;
         if (tt.flag == transpositionFlag::LOWERBOUND && tt.eval <= alpha) return tt.eval;
     }
-    std::sort(moves.begin(), moves.end(), [this, zobrist](const Move& mx, const Move& my)->int {
+    std::sort(moves.begin(), moves.end(), [this, zobrist](const Move& mx, const Move& my)->bool {
         int xval = 0, yval = 0;
-        auto zx = ZobristKey::GetMove(zobrist, mx.from, mx.to, mx.movedPiece);
-        if (auto tx = transposition->at(mask & zx); tx.hash == zx) xval += tx.eval;
-        auto zy = ZobristKey::GetMove(zobrist, my.from, my.to, my.movedPiece);
-        if (auto ty = transposition->at(mask & zy); ty.hash == zx) yval += ty.eval;
+        Zobrist zx = ZobristKey::GetMove(zobrist, mx.from, mx.to, mx.movedPiece);
+        auto tx = transposition->at(mask & zx);
+        if (tx.hash == zx) 
+            xval += tx.eval;
+        Zobrist zy = ZobristKey::GetMove(zobrist, my.from, my.to, my.movedPiece);
+        auto ty = transposition->at(mask & zy);
+        if (ty.hash == zy) 
+            yval += ty.eval;
         xval <<= 3;
         yval <<= 3;
         xval |= getPieceType(mx.capturedPiece) | getPieceType(mx.promotedToPieceType);
         yval |= getPieceType(my.capturedPiece) | getPieceType(my.promotedToPieceType);
-        return xval - yval;
+        return xval > yval;
     });
     Move bestMove = moves.front();
     transpositionFlag bestFlag = transpositionFlag::EXACT;
@@ -226,7 +230,7 @@ int ComputerPlayer::Eval(Board& bd) const
 
 ComputerPlayer::ComputerPlayer(uint8_t max_depth, Clock maxTime) : max_depth(max_depth), maxTime(maxTime)
 {
-	transposition->fill(MoveEval{ 0,NullMove,0,0,0 });
+	transposition->fill(MoveEval{ 0,NullMove,0,0,transpositionFlag::NONE });
 	for (int p = PieceUtils::Pawn; p <= PieceUtils::King; p++) {
 		for (int sq = 0; sq < 64; sq++) {
 			mg_table[p | PieceUtils::White][sq] = mg_pesto_table[p][sq];
@@ -264,10 +268,10 @@ Move ComputerPlayer::Think(Board bd)
     auto sTime = std::chrono::system_clock::now();
     std::cout << "Computer thinks..." << std::endl;
     curr = bd.getZobristKey();
-    int depth = 1;
-    while (depth<=max_depth){
-        if (std::chrono::system_clock::now() - sTime > maxTime || NegaMax(bd, Checkmate, Checkmate, depth) > Checkmate - max_depth) break;
+    int depth = 0;
+    while (depth<max_depth){
         depth++;
+        if (std::chrono::system_clock::now() - sTime > maxTime || NegaMax(bd, Checkmate, Checkmate, depth) > Checkmate - max_depth) break;
     }
     if (curr != bd.getZobristKey()) {
         std::cout << "WTF?" << std::endl;

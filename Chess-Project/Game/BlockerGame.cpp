@@ -16,6 +16,34 @@ GameTerminalState BlockerGame::StartGame()
 		while (stateChanged) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(33));
 		}
+		candidate = (bd.isWhiteToMove ? white : black)->Think(bd);
+		if (!isGameOn) break;
+		try {
+			bd.MakeMove(candidate);
+		}
+		catch (std::invalid_argument invalidMove) {
+			if (bd.isWhiteToMove) {
+				if (!player1isWhite) {
+					player1++;
+				}
+				else {
+					player2++;
+				}
+				rs.winner = Winner::Black;
+			}
+			else {
+				if (player1isWhite) {
+					player1++;
+				}
+				else {
+					player2++;
+				}
+				rs.winner = Winner::White;
+			}
+			rs.reason = Reason::IllegalMove;
+			return rs;
+		}
+		stateChanged = true;
 		blockerCandidate = (bd.isWhiteToMove ? black : white)->ThinkBlocker(bd);
 		if (!isGameOn) break;
 		try {
@@ -23,70 +51,26 @@ GameTerminalState BlockerGame::StartGame()
 			stateChanged = true;
 		}
 		catch (std::invalid_argument invalidMove) {
-
-			if (invalidMove.what() == "Illegal blocker move") {
-				if (bd.isWhiteToMove) {
-					if (!player1isWhite) {
-						player1++;
-					}
-					else {
-						player2++;
-					}
-					rs.winner = Winner::Black;
+			if (bd.isWhiteToMove) {
+				if (!player1isWhite) {
+					player1++;
 				}
 				else {
-					if (player1isWhite) {
-						player1++;
-					}
-					else {
-						player2++;
-					}
-					rs.winner = Winner::White;
+					player2++;
 				}
-				rs.reason = Reason::IllegalMove;
-				return rs;
-			}
-			else{
-				std::cout << invalidMove.what() << std::endl;
-				throw invalidMove;
-			}
-		}
-		while (stateChanged) {
-			std::this_thread::sleep_for(std::chrono::milliseconds(33));
-		}
-		candidate = (bd.isWhiteToMove ? white : black)->Think(bd);
-		if (!isGameOn) break;
-		try {
-			bd.MakeMove(candidate);
-			stateChanged = true;
-		}
-		catch (std::invalid_argument invalidMove) {
-			if (invalidMove.what() == "Illegal move") {
-				if (bd.isWhiteToMove) {
-					if (!player1isWhite) {
-						player1++;
-					}
-					else {
-						player2++;
-					}
-					rs.winner = Winner::Black;
-				}
-				else {
-					if (player1isWhite) {
-						player1++;
-					}
-					else {
-						player2++;
-					}
-					rs.winner = Winner::White;
-				}
-				rs.reason = Reason::IllegalMove;
-				return rs;
+				rs.winner = Winner::Black;
 			}
 			else {
-				std::cout << invalidMove.what() << std::endl;
-				throw invalidMove;
+				if (player1isWhite) {
+					player1++;
+				}
+				else {
+					player2++;
+				}
+				rs.winner = Winner::White;
 			}
+			rs.reason = Reason::IllegalMove;
+			return rs;
 		}
 	}
 	isGameOn = false;

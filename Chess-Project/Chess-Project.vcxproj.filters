@@ -193,6 +193,45 @@
     <Image Include="Assets\Board.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Assets\Pieces\Chess.com\bb.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Chess.com\bk.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Chess.com\bn.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Chess.com\bp.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Chess.com\bq.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Chess.com\br.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Chess.com\duck.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Chess.com\wb.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Chess.com\wk.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Chess.com\wn.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Chess.com\wp.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Chess.com\wq.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Chess.com\wr.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Media Include="Assets\Sounds\Default\capture.wav">
@@ -207,5 +246,8 @@
     <Media Include="Assets\Sounds\Default\move.wav">
       <Filter>Resource Files</Filter>
     </Media>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Assets\Roboto-Regular.ttf" />
   </ItemGroup>
 </Project>

@@ -13,6 +13,7 @@ sf::Texture BoardView::whiteQueen;
 sf::Texture BoardView::blackQueen;
 sf::Texture BoardView::whiteKing;
 sf::Texture BoardView::blackKing;
+sf::Texture BoardView::duck;
 
 void BoardView::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
@@ -34,12 +35,12 @@ BoardView::BoardView(sf::Vector2f pos, float size, Players white, Players black,
 	if (white == Players::HumanPlayer)
 		this->white = std::make_shared<HumanPlayer>();
 	else
-		this->white = std::make_shared<ComputerPlayer>();
+		this->white = std::make_shared<ComputerPlayer>(5,std::chrono::seconds(2));
 
 	if (black == Players::HumanPlayer)
 		this->black = std::make_shared<HumanPlayer>();
 	else
-		this->black = std::make_shared<ComputerPlayer>();
+		this->black = std::make_shared<ComputerPlayer>(7, std::chrono::seconds(3));
 	if (withBlockers)
 		game = std::make_unique<BlockerGame>(this->white, this->black);
 	else
@@ -52,27 +53,56 @@ void BoardView::Update()
 {
 	float squareSize = size / 8.f;
 	sf::RectangleShape square(sf::Vector2f{ squareSize, squareSize });
+	float circleRadius = squareSize / 6;
+	float circleOffset = squareSize/2 - circleRadius;
+	sf::CircleShape circle(circleRadius);
 	if (game->stateChanged || selectedChanged || sizeOrPosChanged) {
 		if(!moves->empty())
 			moves->clear();
 		std::unordered_set<uint16_t> drawnMoves;
-		if (selected != -1) {
+		HumanPlayer* toMove = nullptr;
+		HumanPlayer* toMoveBlocker = nullptr;
+		if (auto d = dynamic_cast<HumanPlayer*>(white.get()); d != nullptr)
+		{
+			if (d->move) toMove = d;
+			if (d->blockerMove) toMoveBlocker = d;
+		}
+		if (auto d = dynamic_cast<HumanPlayer*>(black.get()); d != nullptr)
+		{
+			if (d->move) toMove = d;
+			if (d->blockerMove) toMoveBlocker = d;
+		}
+		if (toMove && selected != -1) {
 			auto& legal_moves = game->bd.GetLegalMoves();
 			for (Move move : legal_moves) {
 				if (move.from == selected) {
 					if (!drawnMoves.insert((static_cast<uint16_t>(move.from) << 8) | move.to).second) continue;
 					legalMoves.push_back({ move.from, move.to, static_cast<bool>(move.capturedPiece), static_cast<bool>(move.promotedToPieceType) });
 					if (move.capturedPiece && move.promotedToPieceType)
-						square.setFillColor(sf::Color(255, 255, 0, 150));
+						circle.setFillColor(sf::Color(150, 150, 100, 200));
 					else if (move.capturedPiece)
-						square.setFillColor(sf::Color(255, 0, 0, 150));
+						circle.setFillColor(sf::Color(150, 100, 100, 200));
 					else if (move.promotedToPieceType)
-						square.setFillColor(sf::Color(0, 255, 0, 150));
+						circle.setFillColor(sf::Color(100, 150, 100, 200));
+					else if (move.isCastle.toBool())
+						circle.setFillColor(sf::Color(200, 200, 200, 200));
 					else
-						square.setFillColor(sf::Color(0, 0, 255, 150));
-					square.setPosition(sf::Vector2f{ pos.x + GetFile(move.to) * squareSize, pos.y + GetRank(move.to) * squareSize });
-					moves->push_back(square);
+						circle.setFillColor(sf::Color(100, 100, 100, 200));
+					circle.setPosition(sf::Vector2f{ (pos.x + GetFile(move.to) * squareSize) + circleOffset, (pos.y + GetRank(move.to) * squareSize) + circleOffset });
+					moves->push_back(circle);
 				}
+			}
+		}
+		else if (toMoveBlocker) {
+			Bitboard available = ~(game->bd.getAllPiecesBitboard());
+			if(isValidSquare(game->bd.blockerSquare))
+				BitboardHelpers::clearBit(available, game->bd.blockerSquare);
+			Square sq;
+			circle.setFillColor(sf::Color(100, 100, 150, 200));
+			while (available) {
+				sq = BitboardHelpers::getAndClearIndexOfLSB(available);
+				circle.setPosition(sf::Vector2f{ (pos.x + GetFile(sq) * squareSize) + circleOffset, (pos.y + GetRank(sq) * squareSize) + circleOffset });
+				moves->push_back(circle);
 			}
 		}
 		selectedChanged = false;
@@ -99,12 +129,7 @@ void BoardView::Update()
 			case PieceUtils::Black | PieceUtils::Rook: square.setTexture(&blackRook); break;
 			case PieceUtils::Black | PieceUtils::Queen: square.setTexture(&blackQueen); break;
 			case PieceUtils::Black | PieceUtils::King: square.setTexture(&blackKing); break;
-			case PieceUtils::Blocker:
-				square.setTexture(nullptr);
-				square.setFillColor(sf::Color::Black);
-				pieces->push_back(square);
-				square.setFillColor(sf::Color::White);
-				continue;
+			case PieceUtils::Blocker: square.setTexture(&duck); break;
 			default:
 				continue;
 			}
@@ -154,6 +179,10 @@ void BoardView::HandleMousePress(sf::Event::MouseButtonEvent& e, sf::RenderTarge
 			selected = newSelected;
 			selectedChanged = true;
 		}
+		else if (selected == newSelected) {
+			selected = -1;
+			selectedChanged = true;
+		}
 		else {
 			for (auto mv : legalMoves) {
 				if (mv.to == newSelected && mv.from == selected) {
@@ -189,35 +218,38 @@ void BoardView::loadTextures()
 {
 	if (texturesLoaded) return;
 	texturesLoaded = true;
-	if (!whitePawn.loadFromFile("Assets/Pieces/Default/wp.png"))
+	if (!whitePawn.loadFromFile("Assets/Pieces/Chess.com/wp.png"))
 		throw std::invalid_argument("White Pawn texture missing");
-	if (!blackPawn.loadFromFile("Assets/Pieces/Default/bp.png"))
+	if (!blackPawn.loadFromFile("Assets/Pieces/Chess.com/bp.png"))
 		throw std::invalid_argument("Black Pawn texture missing");
 
-	if (!whiteKnight.loadFromFile("Assets/Pieces/Default/wn.png"))
+	if (!whiteKnight.loadFromFile("Assets/Pieces/Chess.com/wn.png"))
 		throw std::invalid_argument("White Knight texture missing");
-	if (!blackKnight.loadFromFile("Assets/Pieces/Default/bn.png"))
+	if (!blackKnight.loadFromFile("Assets/Pieces/Chess.com/bn.png"))
 		throw std::invalid_argument("Black Knight texture missing");
 
-	if (!whiteBishop.loadFromFile("Assets/Pieces/Default/wb.png"))
+	if (!whiteBishop.loadFromFile("Assets/Pieces/Chess.com/wb.png"))
 		throw std::invalid_argument("White Bishop texture missing");
-	if (!blackBishop.loadFromFile("Assets/Pieces/Default/bb.png"))
+	if (!blackBishop.loadFromFile("Assets/Pieces/Chess.com/bb.png"))
 		throw std::invalid_argument("Black Bishop texture missing");
 
-	if (!whiteRook.loadFromFile("Assets/Pieces/Default/wr.png"))
+	if (!whiteRook.loadFromFile("Assets/Pieces/Chess.com/wr.png"))
 		throw std::invalid_argument("White Rook texture missing");
-	if (!blackRook.loadFromFile("Assets/Pieces/Default/br.png"))
+	if (!blackRook.loadFromFile("Assets/Pieces/Chess.com/br.png"))
 		throw std::invalid_argument("Black Rook texture missing");
 
-	if (!whiteQueen.loadFromFile("Assets/Pieces/Default/wq.png"))
+	if (!whiteQueen.loadFromFile("Assets/Pieces/Chess.com/wq.png"))
 		throw std::invalid_argument("White Queen texture missing");
-	if (!blackQueen.loadFromFile("Assets/Pieces/Default/bq.png"))
+	if (!blackQueen.loadFromFile("Assets/Pieces/Chess.com/bq.png"))
 		throw std::invalid_argument("Black Queen texture missing");
 
-	if (!whiteKing.loadFromFile("Assets/Pieces/Default/wk.png"))
+	if (!whiteKing.loadFromFile("Assets/Pieces/Chess.com/wk.png"))
 		throw std::invalid_argument("White King texture missing");
-	if (!blackKing.loadFromFile("Assets/Pieces/Default/bk.png"))
+	if (!blackKing.loadFromFile("Assets/Pieces/Chess.com/bk.png"))
 		throw std::invalid_argument("Black King texture missing");
+
+	if (!duck.loadFromFile("Assets/Pieces/Chess.com/duck.png"))
+		throw std::invalid_argument("Duck texture missing");
 }
 
 BoardView::~BoardView()
