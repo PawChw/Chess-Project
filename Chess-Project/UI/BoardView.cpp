@@ -35,12 +35,12 @@ BoardView::BoardView(sf::Vector2f pos, float size, Players white, Players black,
 	if (white == Players::HumanPlayer)
 		this->white = std::make_shared<HumanPlayer>();
 	else
-		this->white = std::make_shared<ComputerPlayer>(5,std::chrono::seconds(2));
+		this->white = std::make_shared<ComputerPlayer>();
 
 	if (black == Players::HumanPlayer)
 		this->black = std::make_shared<HumanPlayer>();
 	else
-		this->black = std::make_shared<ComputerPlayer>(7, std::chrono::seconds(3));
+		this->black = std::make_shared<ComputerPlayer>();
 	if (withBlockers)
 		game = std::make_unique<BlockerGame>(this->white, this->black);
 	else

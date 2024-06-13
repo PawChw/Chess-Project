@@ -158,7 +158,7 @@ int ComputerPlayer::NegaMax(Board& bd, int alpha, int beta, int depth)
     Move bestMove = moves.front();
     transpositionFlag bestFlag = transpositionFlag::EXACT;
     for (auto move : moves) {
-        bd.MakeMove(move);
+        bd.ForceMakeMove(move);
         val = -NegaMax(bd, -beta, -alpha, depth - 1);
         bd.UndoMove();
         if (val >= beta) {
@@ -184,7 +184,7 @@ int ComputerPlayer::NegaMax(Board& bd, int alpha, int beta, int depth)
 
 int ComputerPlayer::quiesce(Board& bd, int alpha, int beta)
 {
-    return Eval(bd)+bd.GetLegalMoves().size();
+    return Eval(bd);
 }
 
 int ComputerPlayer::Eval(Board& bd) const

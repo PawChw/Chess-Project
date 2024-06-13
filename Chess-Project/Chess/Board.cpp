@@ -346,7 +346,7 @@ Bitboard Board::getWhiteBitboard() const
 
     for (int i = 63; i >= 0; i--) {
         bitboard <<= 1;
-        if (getColor(board[i]) == White)
+        if (board[i] & White)
             bitboard |= 1;
     }
     return bitboard;
@@ -358,7 +358,7 @@ Bitboard Board::getBlackBitboard() const
 
     for (int i = 63; i >= 0; i--) {
         bitboard <<= 1;
-        if (getColor(board[i]) == Black)
+        if (board[i] & Black)
             bitboard |= 1;
     }
     return bitboard;
@@ -370,7 +370,7 @@ Bitboard Board::getAllPiecesBitboard() const
 
     for (int i = 63; i >= 0; i--) {
         bitboard <<= 1;
-        if (board[i] != None)
+        if(board[i])
             bitboard |= 1;
     }
     return bitboard;
@@ -420,7 +420,12 @@ bool Board::is50MoveRule() const
 
 bool Board::isSteelMate()
 {
-    return !isInCheck(isWhiteToMove) && GetLegalMoves().size() == 0;
+    if (isInCheck(isWhiteToMove)) return false;
+    Bitboard myBB = isWhiteToMove ? getWhiteBitboard() : getBlackBitboard(),
+        myPawns = getBitboard(Pawn, isWhiteToMove ? White : Black);
+    BitboardHelpers::clearBit(myBB, isWhiteToMove ? whiteKing : blackKing);
+    if (myPawns ^ myBB) return false;
+    return GetLegalMoves().size() == 0;
 }
 
 bool Board::isRepetition()
@@ -455,7 +460,9 @@ Zobrist Board::getZobristKey() const
     return currHash;
 }
 
-const std::array<Piece, 64>& Board::GetBoard() const
+std::array<Piece, 64> Board::GetBoard() const
 {
-    return board;
+    std::array<Piece, 64> r;
+    std::copy(std::begin(board), std::end(board), r.begin());
+    return r;
 }
