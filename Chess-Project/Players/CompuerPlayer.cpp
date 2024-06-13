@@ -123,48 +123,64 @@ const int16_t ComputerPlayer::eg_king_table[64] = {
 
 int ComputerPlayer::NegaMax(Board& bd, int alpha, int beta, int depth)
 {
-    if (bd.isCheckMate()) return -Checkmate - depth;
-    if (bd.isDraw()) return -Checkmate/10;
+    int bestVal = -Checkmate, val;
+    if (depth == 0) return quiesce(bd, alpha, beta);
+    if (bd.isCheckMate()) return -Checkmate + bd.ply_count;
+    if (bd.isDraw()) {
+        val = Eval(bd);
+        if (val < -1000) return 100;
+        return -1000;
+    }
     auto moves = bd.GetLegalMoves();
-    bd.blockerSquare = -1;
-    int staticEval = Eval(bd) + moves.size();
-    std::vector<int> resoults;
-    auto zobrist = bd.getZobristKey();
+    Zobrist zobrist = bd.getZobristKey();
     auto& tt = transposition->at(mask & zobrist);
-    if (tt.hash == zobrist && tt.depth == depth && isMoveInVector(moves, tt.move)) return tt.eval;
-    if (depth == 0) return staticEval + static_cast<int>(moves.size());
-    std::sort(moves.begin(), moves.end(), [zobrist, this](const Move& mx, const Move& my) {
-        int xval = ZobristKey::GetMove(zobrist, mx.from, mx.to, mx.movedPiece),
-            yval = ZobristKey::GetMove(zobrist, my.from, my.to, my.movedPiece);
+    if (tt.hash == zobrist && tt.depth >= depth) {
+        if (tt.flag == transpositionFlag::EXACT) return tt.eval;
+        if (tt.flag == transpositionFlag::UPPERBOUND && tt.eval >= beta) return tt.eval;
+        if (tt.flag == transpositionFlag::LOWERBOUND && tt.eval <= alpha) return tt.eval;
+    }
+    std::sort(moves.begin(), moves.end(), [this, zobrist](const Move& mx, const Move& my)->int {
+        int xval = 0, yval = 0;
+        auto zx = ZobristKey::GetMove(zobrist, mx.from, mx.to, mx.movedPiece);
+        if (auto tx = transposition->at(mask & zx); tx.hash == zx) xval += tx.eval;
+        auto zy = ZobristKey::GetMove(zobrist, my.from, my.to, my.movedPiece);
+        if (auto ty = transposition->at(mask & zy); ty.hash == zx) yval += ty.eval;
         xval <<= 3;
         yval <<= 3;
         xval |= getPieceType(mx.capturedPiece) | getPieceType(mx.promotedToPieceType);
         yval |= getPieceType(my.capturedPiece) | getPieceType(my.promotedToPieceType);
-        return yval < xval;
+        return xval - yval;
     });
-    int bestScore = -Checkmate;
-    int val, lb = alpha - 100, ub = beta + 100;
     Move bestMove = moves.front();
-    for (auto m : moves) {
-        bd.ForceMakeMove(m);
-        val = -NegaMax(bd, -beta, -alpha, depth - 1) + (m.isCastle.toBool() ? 100 : 0);
+    transpositionFlag bestFlag = transpositionFlag::EXACT;
+    for (auto move : moves) {
+        bd.MakeMove(move);
+        val = -NegaMax(bd, -beta, -alpha, depth - 1);
         bd.UndoMove();
         if (val >= beta) {
-            bestScore = val;
-            bestMove = m;
+            bestVal = val;
+            bestFlag = transpositionFlag::UPPERBOUND;
             break;
         }
-        if (val > bestScore) {
-            bestScore = val;
-            bestMove = m;
-            if (val > alpha)
-                alpha = val;
+        if (val > bestVal) {
+            bestVal = val;
+            bestMove = move;
+            if (val > alpha) {
+                bestFlag = transpositionFlag::LOWERBOUND;
+                alpha = bestVal;
+            }
         }
     }
-    tt.eval = bestScore;
+    tt.flag = bestFlag;
+    tt.eval = bestVal;
     tt.hash = zobrist;
     tt.move = bestMove;
-    return bestScore;
+    return bestVal;
+}
+
+int ComputerPlayer::quiesce(Board& bd, int alpha, int beta)
+{
+    return Eval(bd)+bd.GetLegalMoves().size();
 }
 
 int ComputerPlayer::Eval(Board& bd) const
@@ -229,6 +245,8 @@ Square ComputerPlayer::ThinkBlocker(Board bd)
 		BitboardHelpers::clearBit(av, bd.blockerSquare);
 	if (tt.hash != bd.getZobristKey())
         NegaMax(bd, -Checkmate/10, Checkmate/10, 2);
+    if (BitboardHelpers::getBit(av, tt.move.to))
+        return tt.move.to;
 	Square to = tt.move.from;
 	auto fileDiff = GetFile(tt.move.to) - GetFile(tt.move.from),
 		rankDiff = GetRank(tt.move.to) - GetRank(tt.move.from);

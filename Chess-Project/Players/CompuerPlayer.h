@@ -9,12 +9,16 @@
 #include "../Game.h"
 #include "../Chess.h"
 
+enum class transpositionFlag : uint8_t {
+    EXACT, UPPERBOUND, LOWERBOUND
+};
+
 struct MoveEval {
 	int8_t depth;
 	Move move;
 	int eval;
 	Zobrist hash;
-	int8_t flag;
+    transpositionFlag flag;
 };
 
 using Clock = std::chrono::system_clock::duration;
@@ -25,6 +29,7 @@ private:
 	std::unique_ptr< std::array<MoveEval, mask + 1>> transposition = std::make_unique< std::array<MoveEval, mask + 1>>();
 	uint8_t max_depth;
 	int NegaMax(Board& bd, int alpha, int beta, int depth);
+    int quiesce(Board& bd, int alpha, int beta);
 	static const int Checkmate = 10000;
 	std::array<int, King+1> PieceVals = { 0, 100, 325, 325, 500, 975, Checkmate };
 	Zobrist curr=0;
