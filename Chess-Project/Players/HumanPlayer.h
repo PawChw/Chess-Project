@@ -21,8 +21,10 @@ public:
     std::atomic_bool move = false, blockerMove = false;
     HumanPlayer() = default;
     Move Think(Board bd) override;
-    bool TryMove(Square from, Square to);
     Square ThinkBlocker(Board bd) override;
+    bool TryMove(Square from, Square to);
     bool TryMoveBlocker(Square to);
+    bool TryMove();
+    bool TryMoveBlocker();
 };
 

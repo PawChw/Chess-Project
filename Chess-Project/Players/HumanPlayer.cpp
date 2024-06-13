@@ -69,3 +69,28 @@ bool HumanPlayer::TryMoveBlocker(Square to) {
 	cv.notify_all();
 	return true;
 }
+
+bool HumanPlayer::TryMove()
+{
+	if (!move) return false;
+	{
+		std::unique_lock lk(m);
+		toMake = legalMoves.at(0);
+		move = false;
+	}
+	cv.notify_all();
+	return true;
+}
+
+bool HumanPlayer::TryMoveBlocker()
+{
+	if (!blockerMove) return false;
+	auto to = BitboardHelpers::getIndexOfFSB(~notAvailableSquares);
+	{
+		std::unique_lock lk(m);
+		toMoveBlocker = to;
+		blockerMove = false;
+	}
+	cv.notify_all();
+	return true;
+}

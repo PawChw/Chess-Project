@@ -11,11 +11,12 @@ GameTerminalState Game::StartGame()
 {
 	isGameOn = true;
 	Move candidate;
-	while (!(bd.isCheckMate() || bd.isDraw())) {
+	while (!(bd.isCheckMate() || bd.isDraw()) && isGameOn) {
 		while (stateChanged) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(33));
 		}
 		candidate = (bd.isWhiteToMove ? white : black)->Think(bd);
+		if (!isGameOn) break;
 		try {
 			bd.MakeMove(candidate);
 			stateChanged = true;

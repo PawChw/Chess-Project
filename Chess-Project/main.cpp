@@ -8,8 +8,9 @@
 #include <string>
 #include <algorithm>
 #include <Windows.h>
+#include "Players/CompuerPlayer.h"
 
-int main() {
+void GameLoop() {
 	sf::RenderWindow window(sf::VideoMode(1200, 800), "Chess");
 	sf::Vector2u size = window.getSize();
 	sf::Text whites;
@@ -22,7 +23,7 @@ int main() {
 	std::string blackWinsString = "Player2 wins: 0";
 	std::string drawsString = "Draw: 0";
 	bool round = true;
-	BoardView board(sf::Vector2f(0, 0), std::min(size.y * 1.f, size.x * 2.f / 3), Players::HumanPlayer, Players::ComputerPlayer, true);
+	BoardView board(sf::Vector2f(0, 0), std::min(size.y * 1.f, size.x * 2.f / 3), Players::ComputerPlayer, Players::ComputerPlayer, false);
 	font.loadFromFile("Assets/Roboto-Regular.ttf");
 	window.setFramerateLimit(30);
 	whites.setPosition(sf::Vector2f{ size.x * 2.f / 3 + 100, 150 });
@@ -116,11 +117,19 @@ int main() {
 			update = true;
 		}
 	}
-	auto handle = gameThread.native_handle();
-	if (handle) {
-		if (!TerminateThread(handle, 1))
-			throw std::runtime_error("Failed to terminate thread");
+	board.game->isGameOn = false;
+	if (auto d = dynamic_cast<HumanPlayer*>(board.white.get()); d != nullptr) {
+		d->TryMove();
+		d->TryMoveBlocker();
+	}
+	if (auto d = dynamic_cast<HumanPlayer*>(board.black.get()); d != nullptr) {
+		d->TryMove();
+		d->TryMoveBlocker();
 	}
 	if (gameThread.joinable())
 		gameThread.join();
+}
+
+int main() {
+	GameLoop();
 }
