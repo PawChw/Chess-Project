@@ -35,7 +35,7 @@ BoardView::BoardView(sf::Vector2f pos, float size, Players white, Players black,
 	if (white == Players::HumanPlayer)
 		this->white = std::make_shared<HumanPlayer>();
 	else
-		this->white = std::make_shared<ComputerPlayer>();
+		this->white = std::make_shared<ComputerPlayer1>();
 
 	if (black == Players::HumanPlayer)
 		this->black = std::make_shared<HumanPlayer>();

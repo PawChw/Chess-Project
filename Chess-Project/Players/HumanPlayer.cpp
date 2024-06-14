@@ -30,6 +30,8 @@ bool HumanPlayer::TryMove(Square from, Square to) {
 	if (getPieceType(candidate.movedPiece) == Pawn && GetRank(to) == (getColor(candidate.movedPiece) == White ? 0 : 7)) {
 		candidate.promotedToPieceType = Queen;
 	}
+	if (candidate.to == board.epSquare && getPieceType(candidate.movedPiece) == Pawn) candidate.capturedPiece = Pawn;
+	else candidate.capturedPiece = board.getPieceOnSquare(to);
 	index = findMove(legalMoves, candidate);
 	if (index == -1) return false;
 	{

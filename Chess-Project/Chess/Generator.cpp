@@ -38,13 +38,14 @@ bool Generator::checkMove(Move& move) const
 	}
 	Bitboard blockers = allPiecesBitboard, attacksFromKingSquare, enemyPiecesOfSameType;
 	BitboardHelpers::clearBit(blockers, move.from);
-	if (capturedPiece && movedPieceType == Pawn && move.to == board.epSquare) {
+	if (capturedPiece && (movedPieceType == Pawn && move.to == board.epSquare)) {
 		capturedSquare = getSquare(GetFile(move.to), GetRank(move.from));
 		BitboardHelpers::clearBit(blockers, capturedSquare);
 	}
+	BitboardHelpers::setBit(blockers, move.to);
 	for (PieceType i = Pawn; i < King; i++) {
 		enemyPiecesOfSameType = bitboards[static_cast<int>(!movesFor)][static_cast<int>(i)];
-		if (i == capturedPiece) BitboardHelpers::clearBit(enemyPiecesOfSameType, capturedPiece);
+		if (i == capturedPiece) BitboardHelpers::clearBit(enemyPiecesOfSameType, capturedSquare);
 		attacksFromKingSquare = GetPieceMoves(i, interesetedIn, 0, blockers, movesFor, 0, true);
 		if (static_cast<bool>(attacksFromKingSquare & enemyPiecesOfSameType)) return false;
 	}
@@ -61,11 +62,11 @@ Generator::Generator(const Board& board, bool movesFor) : board(board), movesFor
 	seedBitboards();
 }
 
-std::vector<Move> Generator::GenerateLegalMoves()
+std::vector<Move> Generator::GenerateLegalMoves(bool capturesOnly)
 {
 	const static std::array< std::array<Bitboard, 2>, 2> castleChecks = { { {96ull, 14ull}, {6917529027641081856ull, 1008806316530991104ull}} }; // K, Q, k, q
 	std::vector<Move> moves;
-	Bitboard tmp, movesbb, notOurBB = ~(bitboards[static_cast<int>(movesFor)][0]);
+	Bitboard tmp, movesbb, notOurBB = ~(bitboards[static_cast<int>(movesFor)][0]), enemyBB = bitboards[static_cast<int>(movesFor)][0];
 	Square ourKingSquare = movesFor ? board.whiteKing : board.blackKing, enemyKingSquare = movesFor ? board.blackKing : board.whiteKing;
 	Color c = movesFor ? White : Black;
 	Move move{0};
@@ -75,7 +76,8 @@ std::vector<Move> Generator::GenerateLegalMoves()
 		tmp = bitboards[static_cast<int>(movesFor)][static_cast<int>(i)];
 		while (static_cast<bool>(tmp)) {
 			move.from = BitboardHelpers::getAndClearIndexOfLSB(tmp);
-			movesbb = GetPieceMoves(i, move.from, enemyKingSquare, allPiecesBitboard, movesFor, board.epSquare, false) & notOurBB;
+			movesbb = GetPieceMoves(i, move.from, enemyKingSquare, allPiecesBitboard, movesFor, board.epSquare, capturesOnly) & notOurBB;
+			if (capturesOnly) movesbb &= allPiecesBitboard;
 			move.movedPiece = c | i;
 			while (static_cast<bool>(movesbb)) {
 				move.to = BitboardHelpers::getAndClearIndexOfLSB(movesbb);

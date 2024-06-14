@@ -50,6 +50,7 @@ public:
 		blockerSquare = -1;
 	std::array<std::array<bool, 2>, 2 > castleRights = { {{true, true}, {true, true}} }; // k, q, K, Q
 	const std::vector<Move>& GetLegalMoves();
+	const std::vector<Move> GetCaptures();
 	void MakeMove(Move move);
 	void MoveBlocker(Square newBlockerSquare);
 	void ForceMakeMove(Move move);
@@ -69,6 +70,7 @@ public:
 	bool isDraw();
 	bool isInCheck(bool whoIs) const;
 	bool isCheckMate();
+	bool wasProomtion() const;
 	Zobrist getZobristKey() const;
 	std::array<Piece, 64> GetBoard() const;
 

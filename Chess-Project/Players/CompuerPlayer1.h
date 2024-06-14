@@ -9,27 +9,9 @@
 #include <chrono>
 #include "../Game.h"
 #include "../Chess.h"
+#include "../Players/CompuerPlayer.h"
 
-enum class transpositionFlag : int8_t {
-    QUIESCE = -1, NONE = 0, LOWERBOUND, EXACT, UPPERBOUND
-};
-
-struct MoveEval {
-	int8_t depth;
-	Move move;
-	int eval;
-	Zobrist hash;
-    transpositionFlag flag;
-};
-
-using Clock = std::chrono::system_clock::duration;
-
-enum TranspositionSize : Zobrist {
-    MB256 = 0x7FFFFF, MB512 = 0xFFFFFF, GB1 = 0x1FFFFFF, GB2 = 0x3FFFFFF, GB4 = 0x3FFFFFF, GB8 = 0x7FFFFFF, GB16 = 0xFFFFFFF
-    // keeping tt size as even number makes it easy to size limit thanks to bitwise or instead of division by size
-};
-
-class ComputerPlayer : public IBlockerPlayer {
+class ComputerPlayer1 : public IBlockerPlayer {
 private:
 	static const Zobrist mask = GB1;
 	std::unique_ptr< std::array<MoveEval, mask + 1>> transposition = std::make_unique< std::array<MoveEval, mask + 1>>();
@@ -87,8 +69,8 @@ public:
     const static int16_t mg_king_table[64];
     const static int16_t eg_king_table[64];
     int Eval(Board& bd) const;
-	ComputerPlayer(uint8_t max_depth = 5, Clock maxTime = std::chrono::seconds(20000), int qseDepth = 3);
+    ComputerPlayer1(uint8_t max_depth = 5, Clock maxTime = std::chrono::seconds(20000), int qseDepth = 3);
 	Square ThinkBlocker(Board bd) override;
 	Move Think(Board bd) override;
-	~ComputerPlayer();
+	~ComputerPlayer1();
 };

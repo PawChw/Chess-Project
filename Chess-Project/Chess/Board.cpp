@@ -310,6 +310,20 @@ const std::vector<Move>& Board::GetLegalMoves()
     return legalMovesCache;
 }
 
+const std::vector<Move> Board::GetCaptures()
+{
+    if (legalMovesCache.empty()) {
+        auto gen = Generator(*this);
+        legalMovesCache = gen.GenerateLegalMoves();
+    }
+    std::vector<Move> legalCaptures;
+    for (Move mv : legalMovesCache) {
+        if (mv.capturedPiece)
+            legalCaptures.push_back(mv);
+    }
+    return legalCaptures;
+}
+
 Bitboard Board::getBitboard(PieceType pieceType) const
 {
     Bitboard bitboard = 0;
@@ -385,11 +399,10 @@ Piece Board::getPieceOnSquare(Square square) const
 
 bool Board::isSquareAttacked(Square square, bool byWho) const
 {
-    Square opposite = byWho ? whiteKing : blackKing;
     Bitboard allPieces = getAllPiecesBitboard(), currCheckBtboard;
-    for (int i = 1; i < 7; i++) {
+    for (int i = Pawn; i < King; i++) {
         currCheckBtboard = getBitboard(static_cast<PieceType>(i), byWho ? White : Black);
-        Bitboard bb = GetPieceMoves(static_cast<PieceType>(i), square, opposite, allPieces, !byWho, epSquare, true);
+        Bitboard bb = GetPieceMoves(static_cast<PieceType>(i), square, 0, allPieces, !byWho, epSquare, true);
         if (static_cast<bool>(bb & currCheckBtboard)) return true;
     }
     return false;
@@ -454,6 +467,11 @@ bool Board::isInCheck(bool whoIs) const
 bool Board::isCheckMate()
 {
     return isInCheck(isWhiteToMove) && GetLegalMoves().size() == 0;
+}
+
+bool Board::wasProomtion() const
+{
+    return static_cast<bool>(gameMoveHistory.back().capturedPiece);
 }
 
 Zobrist Board::getZobristKey() const

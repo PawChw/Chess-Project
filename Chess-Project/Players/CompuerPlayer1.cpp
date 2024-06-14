@@ -1,5 +1,5 @@
-#include "CompuerPlayer.h"
-const int16_t ComputerPlayer::mg_pawn_table[64] = {
+#include "CompuerPlayer1.h"
+const int16_t ComputerPlayer1::mg_pawn_table[64] = {
       0,   0,   0,   0,   0,   0,  0,   0,
      98, 134,  61,  95,  68, 126, 34, -11,
      -6,   7,  26,  31,  65,  56, 25, -20,
@@ -9,7 +9,7 @@ const int16_t ComputerPlayer::mg_pawn_table[64] = {
     -35,  -1, -20, -23, -15,  24, 38, -22,
       0,   0,   0,   0,   0,   0,  0,   0,
 };
-const int16_t ComputerPlayer::eg_pawn_table[64] = {
+const int16_t ComputerPlayer1::eg_pawn_table[64] = {
       0,   0,   0,   0,   0,   0,   0,   0,
     178, 173, 158, 134, 147, 132, 165, 187,
      94, 100,  85,  67,  56,  53,  82,  84,
@@ -19,7 +19,7 @@ const int16_t ComputerPlayer::eg_pawn_table[64] = {
      13,   8,   8,  10,  13,   0,   2,  -7,
       0,   0,   0,   0,   0,   0,   0,   0,
 };
-const int16_t ComputerPlayer::mg_knight_table[64] = {
+const int16_t ComputerPlayer1::mg_knight_table[64] = {
     -167, -89, -34, -49,  61, -97, -15, -107,
      -73, -41,  72,  36,  23,  62,   7,  -17,
      -47,  60,  37,  65,  84, 129,  73,   44,
@@ -29,7 +29,7 @@ const int16_t ComputerPlayer::mg_knight_table[64] = {
      -29, -53, -12,  -3,  -1,  18, -14,  -19,
     -105, -21, -58, -33, -17, -28, -19,  -23,
 };
-const int16_t ComputerPlayer::eg_knight_table[64] = {
+const int16_t ComputerPlayer1::eg_knight_table[64] = {
     -58, -38, -13, -28, -31, -27, -63, -99,
     -25,  -8, -25,  -2,  -9, -25, -24, -52,
     -24, -20,  10,   9,  -1,  -9, -19, -41,
@@ -39,7 +39,7 @@ const int16_t ComputerPlayer::eg_knight_table[64] = {
     -42, -20, -10,  -5,  -2, -20, -23, -44,
     -29, -51, -23, -15, -22, -18, -50, -64,
 };
-const int16_t ComputerPlayer::mg_bishop_table[64] = {
+const int16_t ComputerPlayer1::mg_bishop_table[64] = {
     -29,   4, -82, -37, -25, -42,   7,  -8,
     -26,  16, -18, -13,  30,  59,  18, -47,
     -16,  37,  43,  40,  35,  50,  37,  -2,
@@ -49,7 +49,7 @@ const int16_t ComputerPlayer::mg_bishop_table[64] = {
       4,  15,  16,   0,   7,  21,  33,   1,
     -33,  -3, -14, -21, -13, -12, -39, -21,
 };
-const int16_t ComputerPlayer::eg_bishop_table[64] = {
+const int16_t ComputerPlayer1::eg_bishop_table[64] = {
     -14, -21, -11,  -8, -7,  -9, -17, -24,
      -8,  -4,   7, -12, -3, -13,  -4, -14,
       2,  -8,   0,  -1, -2,   6,   0,   4,
@@ -59,7 +59,7 @@ const int16_t ComputerPlayer::eg_bishop_table[64] = {
     -14, -18,  -7,  -1,  4,  -9, -15, -27,
     -23,  -9, -23,  -5, -9, -16,  -5, -17,
 };
-const int16_t ComputerPlayer::mg_rook_table[64] = {
+const int16_t ComputerPlayer1::mg_rook_table[64] = {
      32,  42,  32,  51, 63,  9,  31,  43,
      27,  32,  58,  62, 80, 67,  26,  44,
      -5,  19,  26,  36, 17, 45,  61,  16,
@@ -69,7 +69,7 @@ const int16_t ComputerPlayer::mg_rook_table[64] = {
     -44, -16, -20,  -9, -1, 11,  -6, -71,
     -19, -13,   1,  17, 16,  7, -37, -26,
 };
-const int16_t ComputerPlayer::eg_rook_table[64] = {
+const int16_t ComputerPlayer1::eg_rook_table[64] = {
     13, 10, 18, 15, 12,  12,   8,   5,
     11, 13, 13, 11, -3,   3,   8,   3,
      7,  7,  7,  5,  4,  -3,  -5,  -3,
@@ -79,7 +79,7 @@ const int16_t ComputerPlayer::eg_rook_table[64] = {
     -6, -6,  0,  2, -9,  -9, -11,  -3,
     -9,  2,  3, -1, -5, -13,   4, -20,
 };
-const int16_t ComputerPlayer::mg_queen_table[64] = {
+const int16_t ComputerPlayer1::mg_queen_table[64] = {
     -28,   0,  29,  12,  59,  44,  43,  45,
     -24, -39,  -5,   1, -16,  57,  28,  54,
     -13, -17,   7,   8,  29,  56,  47,  57,
@@ -89,7 +89,7 @@ const int16_t ComputerPlayer::mg_queen_table[64] = {
     -35,  -8,  11,   2,   8,  15,  -3,   1,
      -1, -18,  -9,  10, -15, -25, -31, -50,
 };
-const int16_t ComputerPlayer::eg_queen_table[64] = {
+const int16_t ComputerPlayer1::eg_queen_table[64] = {
      -9,  22,  22,  27,  27,  19,  10,  20,
     -17,  20,  32,  41,  58,  25,  30,   0,
     -20,   6,   9,  49,  47,  35,  19,   9,
@@ -99,7 +99,7 @@ const int16_t ComputerPlayer::eg_queen_table[64] = {
     -22, -23, -30, -16, -16, -23, -36, -32,
     -33, -28, -22, -43,  -5, -32, -20, -41,
 };
-const int16_t ComputerPlayer::mg_king_table[64] = {
+const int16_t ComputerPlayer1::mg_king_table[64] = {
     -65,  23,  16, -15, -56, -34,   2,  13,
      29,  -1, -20,  -7,  -8,  -4, -38, -29,
      -9,  24,   2, -16, -20,   6,  22, -22,
@@ -109,7 +109,7 @@ const int16_t ComputerPlayer::mg_king_table[64] = {
       1,   7,  -8, -64, -43, -16,   9,   8,
     -15,  36,  12, -54,   8, -28,  24,  14,
 };
-const int16_t ComputerPlayer::eg_king_table[64] = {
+const int16_t ComputerPlayer1::eg_king_table[64] = {
     -74, -35, -18, -18, -11,  15,   4, -17,
     -12,  17,  14,  17,  17,  38,  23,  11,
      10,  17,  23,  15,  20,  45,  44,  13,
@@ -133,7 +133,7 @@ inline static std::string transpositionFlagName(const transpositionFlag& t) {
     return s;
 }
 
-void ComputerPlayer::NegaMaxThread(Board bd, int& alpha, int& beta, int depth, const std::vector<Move>& legalMoves, Move& bestMove, transpositionFlag& bestFlag, int& bestValue)
+void ComputerPlayer1::NegaMaxThread(Board bd, int& alpha, int& beta, int depth, const std::vector<Move>& legalMoves, Move& bestMove, transpositionFlag& bestFlag, int& bestValue)
 {
     int value = bestValue;
     int index = moveIndex.fetch_add(1);
@@ -186,7 +186,7 @@ void ComputerPlayer::NegaMaxThread(Board bd, int& alpha, int& beta, int depth, c
 }
 
 
-Move ComputerPlayer::Think(Board bd)
+Move ComputerPlayer1::Think(Board bd)
 {
     auto sTime = std::chrono::system_clock::now();
     std::cout << "Computer thinks..." << std::endl;
@@ -196,40 +196,21 @@ Move ComputerPlayer::Think(Board bd)
     int bestValue = mateMaxDepth;
     int alpha = mateMaxDepth;
     int beta = -alpha;
-    std::vector<Move> moves = bd.GetLegalMoves();
-    std::sort(moves.begin(), moves.end(), [this](const Move& mx, const Move& my)->bool {
-        int xval = 0, yval = 0;
-        Zobrist zx = ZobristKey::GetMove(curr, mx.from, mx.to, mx.movedPiece);
-        auto tx = transposition->at(mask & zx);
-        if (tx.hash == zx)
-            xval += tx.eval;
-        Zobrist zy = ZobristKey::GetMove(curr, my.from, my.to, my.movedPiece);
-        auto ty = transposition->at(mask & zy);
-        if (ty.hash == zy)
-            yval += ty.eval;
-        xval <<= 3;
-        yval <<= 3;
-        xval += getPieceType(mx.capturedPiece) + getPieceType(mx.promotedToPieceType) - getPieceType(mx.movedPiece);
-        yval += getPieceType(my.capturedPiece) + getPieceType(my.promotedToPieceType) - getPieceType(mx.movedPiece);
-        return xval > yval;
-        });
-    Move bestMove = moves.front();
-    transpositionFlag bestFlag = transpositionFlag::LOWERBOUND;
-    MoveEval tt;
     while (depth < max_depth) {
         moveIndex = 0;
         bestValue = mateMaxDepth;
         alpha = mateMaxDepth;
         beta = -alpha;
-        NegaMaxThread(bd, alpha, beta, depth, moves, bestMove, bestFlag, bestValue);
+        NegaMax(bd, alpha, beta, depth);
         depth++;
     }
+    auto& tt = transposition->at(curr & mask);
     evaluatedPositions.clear();
-    std::cout << "Computer thinks(m)" << (bd.isWhiteToMove ? "(w): " : "(b): ") << static_cast<char>(GetFile(bestMove.to) + 'a') << static_cast<char>('8' - GetRank(bestMove.to)) << "\tvalue: " << bestValue << "\tat depth: " << depth << std::endl;
-    return bestMove;
+    std::cout << "Computer thinks(s)" << (bd.isWhiteToMove ? "(w): " : "(b): ") << static_cast<char>(GetFile(tt.move.to) + 'a') << static_cast<char>('8' - GetRank(tt.move.to)) << "\tvalue: " << tt.eval << "\tat depth: " << static_cast<int>(tt.depth) << std::endl;
+    return tt.move;
 }
 
-int ComputerPlayer::NegaMax(Board& bd, int alpha, int beta, int depth)
+int ComputerPlayer1::NegaMax(Board& bd, int alpha, int beta, int depth)
 {
     Zobrist zobrist = bd.getZobristKey();
     {
@@ -259,23 +240,23 @@ int ComputerPlayer::NegaMax(Board& bd, int alpha, int beta, int depth)
         int xval = 0, yval = 0;
         Zobrist zx = ZobristKey::GetMove(zobrist, mx.from, mx.to, mx.movedPiece);
         auto tx = transposition->at(mask & zx);
-        if (tx.hash == zx) 
+        if (tx.hash == zx)
             xval += tx.eval;
         Zobrist zy = ZobristKey::GetMove(zobrist, my.from, my.to, my.movedPiece);
         auto ty = transposition->at(mask & zy);
-        if (ty.hash == zy) 
+        if (ty.hash == zy)
             yval += ty.eval;
         xval <<= 3;
         yval <<= 3;
         xval += getPieceType(mx.capturedPiece) + getPieceType(mx.promotedToPieceType) - getPieceType(mx.movedPiece);
         yval += getPieceType(my.capturedPiece) + getPieceType(my.promotedToPieceType) - getPieceType(mx.movedPiece);
         return xval > yval;
-    });
+        });
     Move bestMove = moves.front();
     transpositionFlag bestFlag = transpositionFlag::LOWERBOUND;
     for (auto move : moves) {
         bd.ForceMakeMove(move);
-        value = -NegaScout(bd, -(alpha+1), -alpha, depth - 1);
+        value = -NegaScout(bd, -(alpha + 1), -alpha, depth - 1);
         if (value > alpha && value < beta)
             value = -NegaMax(bd, -beta, -alpha, depth - 1);
         bd.UndoMove();
@@ -301,7 +282,7 @@ int ComputerPlayer::NegaMax(Board& bd, int alpha, int beta, int depth)
     return bestVal;
 }
 
-int ComputerPlayer::NegaScout(Board& bd, int alpha, int beta, int depth)
+int ComputerPlayer1::NegaScout(Board& bd, int alpha, int beta, int depth)
 {
     Zobrist zobrist = bd.getZobristKey();
     {
@@ -371,7 +352,7 @@ int ComputerPlayer::NegaScout(Board& bd, int alpha, int beta, int depth)
     return bestVal;
 }
 
-int ComputerPlayer::quiesce(Board& bd, int alpha, int beta, int checks)
+int ComputerPlayer1::quiesce(Board& bd, int alpha, int beta, int checks)
 {
     Zobrist zobrist = bd.getZobristKey();
     {
@@ -391,8 +372,8 @@ int ComputerPlayer::quiesce(Board& bd, int alpha, int beta, int checks)
     if (standPat >= beta) {
         return beta;
     }
-    int BIG_DELTA = PieceVals[Queen]; 
-    if (bd.wasProomtion()) BIG_DELTA += PieceVals[Queen]- 2*PieceVals[Pawn];
+    int BIG_DELTA = PieceVals[Queen];
+    if (bd.wasProomtion()) BIG_DELTA += PieceVals[Queen] - 2 * PieceVals[Pawn];
     if (standPat + BIG_DELTA < alpha) {
         return alpha;
     }
@@ -403,7 +384,7 @@ int ComputerPlayer::quiesce(Board& bd, int alpha, int beta, int checks)
     auto moves = bd.GetLegalMoves();
     if (bd.isInCheck(bd.isWhiteToMove)) {
         checks++;
-        if(checks == qseDepth) return -Checkmate + bd.ply_count;
+        if (checks == qseDepth) return -Checkmate + bd.ply_count;
     }
     else moves = filterSilentMoves(bd, moves);
     int val = alpha;
@@ -439,7 +420,7 @@ int ComputerPlayer::quiesce(Board& bd, int alpha, int beta, int checks)
     return alpha;
 }
 
-std::vector<Move> ComputerPlayer::filterSilentMoves(Board& bd, std::vector<Move> moves)
+std::vector<Move> ComputerPlayer1::filterSilentMoves(Board& bd, std::vector<Move> moves)
 {
     std::vector<Move> captures;
     for (auto mv : moves) {
@@ -471,80 +452,80 @@ std::vector<Move> ComputerPlayer::filterSilentMoves(Board& bd, std::vector<Move>
     return captures;
 }
 
-int ComputerPlayer::Eval(Board& bd) const
+int ComputerPlayer1::Eval(Board& bd) const
 {
 
-	int val = 0, mg=0, eg=0, mg_progress = 0;
-	int attacks, index, eg_progress;
+    int val = 0, mg = 0, eg = 0, mg_progress = 0;
+    int attacks, index, eg_progress;
     bool isWhite = true;
     auto pvals = PieceVals;
-	Bitboard tmp;
-	for (Bitboard side : {bd.getWhiteBitboard(), bd.getBlackBitboard()}) {
-		attacks = 0;
+    Bitboard tmp;
+    for (Bitboard side : {bd.getWhiteBitboard(), bd.getBlackBitboard()}) {
+        attacks = 0;
         auto pvals = PieceVals;
-		for (PieceType p = Pawn; p < King; p++) {
-			tmp = bd.getBitboard(p) & side;
+        for (PieceType p = Pawn; p < King; p++) {
+            tmp = bd.getBitboard(p) & side;
             if (p == Pawn) {
                 int pwns = BitboardHelpers::GetNumOfBitsSet(tmp) - 5;
                 pvals[Knight] += pwns * 6;
                 pvals[Rook] -= pwns * 13;
             }
             else if (p == Bishop && BitboardHelpers::GetNumOfBitsSet(tmp) > 1) val += 50;
-			while (tmp) {
-				index = BitboardHelpers::getAndClearIndexOfLSB(tmp);
-				val += pvals[p];
+            while (tmp) {
+                index = BitboardHelpers::getAndClearIndexOfLSB(tmp);
+                val += pvals[p];
                 mg_progress += mgIncrement[p];
-                mg+=mg_table[p][index | (isWhite ? White : 0)];
-                eg+=eg_table[p][index | (isWhite ? White : 0)];
-			}
-		}
-		val = -val;
+                mg += mg_table[p][index | (isWhite ? White : 0)];
+                eg += eg_table[p][index | (isWhite ? White : 0)];
+            }
+        }
+        val = -val;
         mg = -mg;
         eg = -eg;
         isWhite = !isWhite;
-	}
-    if(mg_progress>24) mg_progress = 24;
+    }
+    if (mg_progress > 24) mg_progress = 24;
     eg_progress = 24 - mg_progress;
     int KingsDistance = std::abs(GetFile(bd.whiteKing) - GetFile(bd.blackKing)) + std::abs(GetRank(bd.whiteKing) - GetRank(bd.blackKing));
-    return (val + (mg * mg_progress + eg * eg_progress) / 24)*(bd.isWhiteToMove ? 1 : -1)+KingsDistance*mg_progress;
+    return (val + (mg * mg_progress + eg * eg_progress) / 24) * (bd.isWhiteToMove ? 1 : -1) + KingsDistance * mg_progress;
 }
 
-ComputerPlayer::ComputerPlayer(uint8_t max_depth, Clock maxTime, int qseDepth) : max_depth(max_depth), maxTime(maxTime), qseDepth(qseDepth)
+ComputerPlayer1::ComputerPlayer1(uint8_t max_depth, Clock maxTime, int qseDepth) : max_depth(max_depth), maxTime(maxTime), qseDepth(qseDepth)
 {
-	transposition->fill(MoveEval{ 0,NullMove,0,0,transpositionFlag::NONE });
-	for (int p = PieceUtils::Pawn; p <= PieceUtils::King; p++) {
-		for (int sq = 0; sq < 64; sq++) {
-			mg_table[p | PieceUtils::White][sq] = mg_pesto_table[p][sq];
-			eg_table[p | PieceUtils::White][sq] = eg_pesto_table[p][sq];
-			mg_table[p][sq] = mg_pesto_table[p][sq ^ 56];
-			eg_table[p][sq] = eg_pesto_table[p][sq ^ 56];
-		}
-	}
+    transposition->fill(MoveEval{ 0,NullMove,0,0,transpositionFlag::NONE });
+    for (int p = PieceUtils::Pawn; p <= PieceUtils::King; p++) {
+        for (int sq = 0; sq < 64; sq++) {
+            mg_table[p | PieceUtils::White][sq] = mg_pesto_table[p][sq];
+            eg_table[p | PieceUtils::White][sq] = eg_pesto_table[p][sq];
+            mg_table[p][sq] = mg_pesto_table[p][sq ^ 56];
+            eg_table[p][sq] = eg_pesto_table[p][sq ^ 56];
+        }
+    }
 }
 
-Square ComputerPlayer::ThinkBlocker(Board bd)
+Square ComputerPlayer1::ThinkBlocker(Board bd)
 {
-	auto& tt = transposition->at(bd.getZobristKey() & mask);
-	Bitboard av = ~bd.getAllPiecesBitboard();
-	if(isValidSquare(bd.blockerSquare))
-		BitboardHelpers::clearBit(av, bd.blockerSquare);
-	if (tt.hash != bd.getZobristKey())
-        NegaMax(bd, -Checkmate/10, Checkmate/10, 2);
+    auto& tt = transposition->at(bd.getZobristKey() & mask);
+    Bitboard av = ~bd.getAllPiecesBitboard();
+    if (isValidSquare(bd.blockerSquare))
+        BitboardHelpers::clearBit(av, bd.blockerSquare);
+    if (tt.hash != bd.getZobristKey())
+        NegaMax(bd, -Checkmate / 10, Checkmate / 10, 2);
     if (BitboardHelpers::getBit(av, tt.move.to))
         return tt.move.to;
-	Square to = tt.move.from;
-	auto fileDiff = GetFile(tt.move.to) - GetFile(tt.move.from),
-		rankDiff = GetRank(tt.move.to) - GetRank(tt.move.from);
-	if (fileDiff > 1) to += 1;
-	else if(fileDiff < -1) to -= 1;
-	if(rankDiff > 1) to += 8;
-	else if(rankDiff < -1) to -= 8;
-	if(BitboardHelpers::getBit(av, to))
-		return to;
-	return BitboardHelpers::getIndexOfLSB(av);
+    Square to = tt.move.from;
+    auto fileDiff = GetFile(tt.move.to) - GetFile(tt.move.from),
+        rankDiff = GetRank(tt.move.to) - GetRank(tt.move.from);
+    if (fileDiff > 1) to += 1;
+    else if (fileDiff < -1) to -= 1;
+    if (rankDiff > 1) to += 8;
+    else if (rankDiff < -1) to -= 8;
+    if (BitboardHelpers::getBit(av, to))
+        return to;
+    return BitboardHelpers::getIndexOfLSB(av);
 }
 
 
-ComputerPlayer::~ComputerPlayer()
+ComputerPlayer1::~ComputerPlayer1()
 {
 }
