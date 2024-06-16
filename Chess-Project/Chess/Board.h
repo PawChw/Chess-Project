@@ -70,6 +70,7 @@ public:
 	bool isDraw();
 	bool isInCheck(bool whoIs) const;
 	bool isCheckMate();
+	bool isKingCapturd() const;
 	bool wasProomtion() const;
 	Zobrist getZobristKey() const;
 	std::array<Piece, 64> GetBoard() const;

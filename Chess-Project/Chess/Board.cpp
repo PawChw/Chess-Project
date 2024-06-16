@@ -469,6 +469,12 @@ bool Board::isCheckMate()
     return isInCheck(isWhiteToMove) && GetLegalMoves().size() == 0;
 }
 
+bool Board::isKingCapturd() const
+{
+    if (blockerSquare == -1) return false;
+    return BitboardHelpers::GetNumOfBitsSet(getBitboard(King)) != 2;
+}
+
 bool Board::wasProomtion() const
 {
     return static_cast<bool>(gameMoveHistory.back().capturedPiece);
