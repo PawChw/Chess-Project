@@ -117,9 +117,7 @@ GameTerminalState BlockerGame::StartGame()
 GameTerminalState BlockerGame::RestartGame()
 {
 	{
-		auto& tmp = white;
-		white = black;
-		black = tmp;
+		std::swap(white, black);
 	}
 	player1isWhite = !player1isWhite;
 	bd = Board();

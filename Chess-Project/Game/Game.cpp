@@ -88,9 +88,7 @@ GameTerminalState Game::StartGame()
 GameTerminalState Game::RestartGame()
 {
 	{
-		auto& tmp = white;
-		white = black;
-		black = tmp;
+		std::swap(white, black);
 	}
 	player1isWhite = !player1isWhite;
 	bd = Board();
