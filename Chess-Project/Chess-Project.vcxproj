@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -71,6 +71,9 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <AdditionalIncludeDirectories>$(ProjectDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -94,9 +97,23 @@
     <ClCompile Include="Players\HumanPlayer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="UI\BoardView.cpp" />
+    <ClCompile Include="UI\Button.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Board.png" />
+    <Image Include="Assets\Pieces\Chess.com\bb.png" />
+    <Image Include="Assets\Pieces\Chess.com\bk.png" />
+    <Image Include="Assets\Pieces\Chess.com\bn.png" />
+    <Image Include="Assets\Pieces\Chess.com\bp.png" />
+    <Image Include="Assets\Pieces\Chess.com\bq.png" />
+    <Image Include="Assets\Pieces\Chess.com\br.png" />
+    <Image Include="Assets\Pieces\Chess.com\duck.png" />
+    <Image Include="Assets\Pieces\Chess.com\wb.png" />
+    <Image Include="Assets\Pieces\Chess.com\wk.png" />
+    <Image Include="Assets\Pieces\Chess.com\wn.png" />
+    <Image Include="Assets\Pieces\Chess.com\wp.png" />
+    <Image Include="Assets\Pieces\Chess.com\wq.png" />
+    <Image Include="Assets\Pieces\Chess.com\wr.png" />
     <Image Include="Assets\Pieces\Default\bb.png" />
     <Image Include="Assets\Pieces\Default\bk.png" />
     <Image Include="Assets\Pieces\Default\bn.png" />
@@ -109,6 +126,7 @@
     <Image Include="Assets\Pieces\Default\wp.png" />
     <Image Include="Assets\Pieces\Default\wq.png" />
     <Image Include="Assets\Pieces\Default\wr.png" />
+    <Image Include="Assets\PromotionBg.png" />
     <Image Include="UI\Assets\Pieces\Default\bb.png" />
     <Image Include="UI\Assets\Pieces\Default\bk.png" />
     <Image Include="UI\Assets\Pieces\Default\bn.png" />
@@ -150,6 +168,11 @@
     <ClInclude Include="Players\HumanPlayer.h" />
     <ClInclude Include="UI\BoardView.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="UI\Button.h" />
+    <ClInclude Include="UI\Common.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Assets\Roboto-Regular.ttf" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Assets\Roboto-Regular.ttf" />

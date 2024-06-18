@@ -13,12 +13,43 @@ void Generator::seedBitboards()
 	allPiecesBitboard = bitboards[0][0] | bitboards[1][0];
 }
 
+//Square interesetedIn = whoIs ? whiteKing : blackKing;
+//return isSquareAttacked(interesetedIn, !whoIs);
+// 
+//Square opposite = byWho ? whiteKing : blackKing;
+//Bitboard allPieces = getAllPiecesBitboard(), currCheckBtboard;
+//for (int i = 1; i < 7; i++) {
+//	currCheckBtboard = getBitboard(static_cast<PieceType>(i), byWho ? White : Black);
+//	Bitboard bb = GetPieceMoves(static_cast<PieceType>(i), square, opposite, allPieces, !byWho, epSquare, true);
+//	if (static_cast<bool>(bb & currCheckBtboard)) return true;
+//}
+//return false;
+
 bool Generator::checkMove(Move& move) const
 {
-	Board tmpBoard = board;
-	tmpBoard.ForceMakeMove(move);
-	bool rs = tmpBoard.isInCheck(movesFor);
-	return !rs;
+	Square interesetedIn, capturedSquare = move.to;
+	PieceType movedPieceType = getPieceType(move.movedPiece),
+		capturedPiece = getPieceType(move.capturedPiece);
+	if (movedPieceType == King) {
+		interesetedIn = move.to;
+	}
+	else {
+		interesetedIn = movesFor ? board.whiteKing : board.blackKing;
+	}
+	Bitboard blockers = allPiecesBitboard, attacksFromKingSquare, enemyPiecesOfSameType;
+	BitboardHelpers::clearBit(blockers, move.from);
+	if (capturedPiece && (movedPieceType == Pawn && move.to == board.epSquare)) {
+		capturedSquare = getSquare(GetFile(move.to), GetRank(move.from));
+		BitboardHelpers::clearBit(blockers, capturedSquare);
+	}
+	BitboardHelpers::setBit(blockers, move.to);
+	for (PieceType i = Pawn; i < King; i++) {
+		enemyPiecesOfSameType = bitboards[static_cast<int>(!movesFor)][static_cast<int>(i)];
+		if (i == capturedPiece) BitboardHelpers::clearBit(enemyPiecesOfSameType, capturedSquare);
+		attacksFromKingSquare = GetPieceMoves(i, interesetedIn, 0, blockers, movesFor, 0, true);
+		if (static_cast<bool>(attacksFromKingSquare & enemyPiecesOfSameType)) return false;
+	}
+	return true;
 }
 
 Generator::Generator(const Board& board): board(board), movesFor(board.isWhiteToMove)
@@ -31,11 +62,11 @@ Generator::Generator(const Board& board, bool movesFor) : board(board), movesFor
 	seedBitboards();
 }
 
-std::vector<Move> Generator::GenerateLegalMoves()
+std::vector<Move> Generator::GenerateLegalMoves(bool capturesOnly)
 {
 	const static std::array< std::array<Bitboard, 2>, 2> castleChecks = { { {96ull, 14ull}, {6917529027641081856ull, 1008806316530991104ull}} }; // K, Q, k, q
 	std::vector<Move> moves;
-	Bitboard tmp, movesbb, notOurBB = ~(bitboards[static_cast<int>(movesFor)][0]);
+	Bitboard tmp, movesbb, notOurBB = ~(bitboards[static_cast<int>(movesFor)][0]), enemyBB = bitboards[static_cast<int>(movesFor)][0];
 	Square ourKingSquare = movesFor ? board.whiteKing : board.blackKing, enemyKingSquare = movesFor ? board.blackKing : board.whiteKing;
 	Color c = movesFor ? White : Black;
 	Move move{0};
@@ -45,7 +76,8 @@ std::vector<Move> Generator::GenerateLegalMoves()
 		tmp = bitboards[static_cast<int>(movesFor)][static_cast<int>(i)];
 		while (static_cast<bool>(tmp)) {
 			move.from = BitboardHelpers::getAndClearIndexOfLSB(tmp);
-			movesbb = GetPieceMoves(i, move.from, enemyKingSquare, allPiecesBitboard, movesFor, board.epSquare, false) & notOurBB;
+			movesbb = GetPieceMoves(i, move.from, enemyKingSquare, allPiecesBitboard, movesFor, board.epSquare, capturesOnly) & notOurBB;
+			if (capturesOnly) movesbb &= allPiecesBitboard;
 			move.movedPiece = c | i;
 			while (static_cast<bool>(movesbb)) {
 				move.to = BitboardHelpers::getAndClearIndexOfLSB(movesbb);

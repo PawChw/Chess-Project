@@ -21,7 +21,7 @@ public:
 	Generator() = delete;
 	Generator(const Board& board);
 	Generator(const Board& board, bool movesFor);
-	std::vector<Move> GenerateLegalMoves(); /*
+	std::vector<Move> GenerateLegalMoves(bool capturesOnly = false); /*
 		Moves are in order!
 		movedPiece asc
 		from asc

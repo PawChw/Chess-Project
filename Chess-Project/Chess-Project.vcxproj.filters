@@ -51,6 +51,9 @@
     <ClCompile Include="UI\BoardView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UI\Button.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Chess\Board.h">
@@ -114,6 +117,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\Button.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\Common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -191,6 +200,48 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="Assets\Board.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Chess.com\bb.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Chess.com\bk.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Chess.com\bn.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Chess.com\bp.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Chess.com\bq.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Chess.com\br.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Chess.com\duck.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Chess.com\wb.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Chess.com\wk.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Chess.com\wn.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Chess.com\wp.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Chess.com\wq.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Pieces\Chess.com\wr.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\PromotionBg.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

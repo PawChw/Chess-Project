@@ -31,7 +31,7 @@ Zobrist ZobristKey::Compute(std::array<Bitboard, 12> bitboards, bool isBlacksTur
 	return value;
 }
 
-Zobrist ZobristKey::GetMove(Square from, Square to, Piece piece, Zobrist old, bool changeMover)
+Zobrist ZobristKey::GetMove(Zobrist old, Square from, Square to, Piece piece, bool changeMover)
 {
 	Zobrist newZobrist = old;
 	Move(newZobrist, from, to, piece, changeMover);

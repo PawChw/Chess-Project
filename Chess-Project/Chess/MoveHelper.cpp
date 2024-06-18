@@ -25,6 +25,11 @@ Move* quickSearchCastle(Move* begin, Move* end, Move toFind) {
 
 Move* quickSearch(Move* begin, Move* end, Move toFind) {
     if(PieceUtils::getPieceType(toFind.movedPiece)==PieceUtils::King && std::abs(toFind.from - toFind.to)==2) return quickSearchCastle(begin, end, toFind);
+    Move last = *(end - 1);
+    while (PieceUtils::getPieceType(last.movedPiece) == PieceUtils::King && std::abs(last.from - last.to) == 2) {
+        end--;
+        last = *(end - 1);
+    }
     return quickNonCastleSearch(begin, end, toFind);
 }
 

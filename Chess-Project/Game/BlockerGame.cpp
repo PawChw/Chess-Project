@@ -20,48 +20,12 @@ GameTerminalState BlockerGame::StartGame()
 	isGameOn = true;
 	Move candidate;
 	Square blockerCandidate;
-	while (!(bd.isCheckMate() || bd.isDraw())) {
-		while (stateChanged) {
-			std::this_thread::sleep_for(std::chrono::milliseconds(33));
-		}
-		blockerCandidate = (bd.isWhiteToMove ? black : white)->ThinkBlocker(bd);
-		try {
-			bd.MoveBlocker(blockerCandidate);
-			stateChanged = true;
-		}
-		catch (std::invalid_argument invalidMove) {
-
-			if (invalidMove.what() == "Illegal blocker move") {
-				if (bd.isWhiteToMove) {
-					if (!player1isWhite) {
-						player1++;
-					}
-					else {
-						player2++;
-					}
-					rs.winner = Winner::Black;
-				}
-				else {
-					if (player1isWhite) {
-						player1++;
-					}
-					else {
-						player2++;
-					}
-					rs.winner = Winner::White;
-				}
-				rs.reason = Reason::IllegalMove;
-				return rs;
-			}
-			else{
-				std::cout << invalidMove.what() << std::endl;
-				throw invalidMove;
-			}
-		}
+	while (!(bd.isCheckMate() || bd.isDraw() || bd.isKingCapturd()) && isGameOn) {
 		while (stateChanged) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(33));
 		}
 		candidate = (bd.isWhiteToMove ? white : black)->Think(bd);
+		if (!isGameOn) break;
 		try {
 			bd.MakeMove(candidate);
 			if (candidate.capturedPiece)
@@ -73,35 +37,57 @@ GameTerminalState BlockerGame::StartGame()
 			else
 				audioPlayer.setBuffer(move);
 			audioPlayer.play();
+		}
+		catch (std::invalid_argument invalidMove) {
+			if (bd.isWhiteToMove) {
+				if (!player1isWhite) {
+					player1++;
+				}
+				else {
+					player2++;
+				}
+				rs.winner = Winner::Black;
+			}
+			else {
+				if (player1isWhite) {
+					player1++;
+				}
+				else {
+					player2++;
+				}
+				rs.winner = Winner::White;
+			}
+			rs.reason = Reason::IllegalMove;
+			return rs;
+		}
+		stateChanged = true;
+		blockerCandidate = (bd.isWhiteToMove ? black : white)->ThinkBlocker(bd);
+		if (!isGameOn) break;
+		try {
+			bd.MoveBlocker(blockerCandidate);
 			stateChanged = true;
 		}
 		catch (std::invalid_argument invalidMove) {
-			if (invalidMove.what() == "Illegal move") {
-				if (bd.isWhiteToMove) {
-					if (!player1isWhite) {
-						player1++;
-					}
-					else {
-						player2++;
-					}
-					rs.winner = Winner::Black;
+			if (bd.isWhiteToMove) {
+				if (!player1isWhite) {
+					player1++;
 				}
 				else {
-					if (player1isWhite) {
-						player1++;
-					}
-					else {
-						player2++;
-					}
-					rs.winner = Winner::White;
+					player2++;
 				}
-				rs.reason = Reason::IllegalMove;
-				return rs;
+				rs.winner = Winner::Black;
 			}
 			else {
-				std::cout << invalidMove.what() << std::endl;
-				throw invalidMove;
+				if (player1isWhite) {
+					player1++;
+				}
+				else {
+					player2++;
+				}
+				rs.winner = Winner::White;
 			}
+			rs.reason = Reason::IllegalMove;
+			return rs;
 		}
 	}
 	isGameOn = false;
@@ -124,6 +110,27 @@ GameTerminalState BlockerGame::StartGame()
 				player2++;
 			}
 			rs.winner = Winner::White;
+		}
+	}
+	else if (bd.isKingCapturd()) {
+		rs.reason = Reason::KingCaptured;
+		if (bd.isWhiteToMove) {
+			if (!player1isWhite) {
+				player1++;
+			}
+			else {
+				player2++;
+			}
+			rs.winner = Winner::White;
+		}
+		else {
+			if (player1isWhite) {
+				player1++;
+			}
+			else {
+				player2++;
+			}
+			rs.winner = Winner::Black;
 		}
 	}
 	else if (bd.is50MoveRule()) {

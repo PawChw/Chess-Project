@@ -19,7 +19,7 @@ public:
 	static Zobrist blackToMove;
 
 	static Zobrist Compute(std::array<Bitboard, 12> bitboards, bool isBlacksTurn);
-	static Zobrist GetMove(Square from, Square to, Piece piece, Zobrist old, bool changeMover = true);
+	static Zobrist GetMove(Zobrist old, Square from, Square to, Piece piece, bool changeMover = true);
 	static void Move(Zobrist& old, Square from, Square to, Piece piece, bool changeMover = true);
 };
 

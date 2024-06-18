@@ -25,7 +25,7 @@ public:
         bb &= ~(1ull << square);
     }
 
-    static inline unsigned int getIndexOfLSB(Bitboard& bb) {
+    static inline unsigned int getIndexOfLSB(const Bitboard& bb) {
         if (!bb) throw std::invalid_argument("Board is empty");
         unsigned long index;
         _BitScanForward64(&index, bb);
@@ -40,7 +40,7 @@ public:
         return static_cast<unsigned int>(index);
     }
 
-    static inline unsigned int getIndexOfFSB(Bitboard& bb) {
+    static inline unsigned int getIndexOfFSB(const Bitboard& bb) {
         if (!bb) throw std::invalid_argument("Board is empty");
         unsigned long index;
         _BitScanReverse64(&index, bb);

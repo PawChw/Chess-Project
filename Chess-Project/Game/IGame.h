@@ -12,7 +12,7 @@ enum class Winner : uint8_t {
 };
 
 enum class Reason : uint8_t {
-	Repetition = 0, InsufficientMaterial, SteelMate, FiftyMoveRule, Checkmate, IllegalMove
+	Repetition = 0, InsufficientMaterial, SteelMate, FiftyMoveRule, Checkmate, IllegalMove, KingCaptured
 };
 
 struct GameTerminalState {

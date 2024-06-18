@@ -20,6 +20,11 @@ bool compareArrays(const std::array<T, S>& arr1, const std::array<T, S>& arr2) {
 	return std::equal(arr1.begin(), arr1.end(), arr2.begin());
 }
 
+template <typename T, int S>
+bool compareArrays(const T* arr1, const T* arr2) {
+	return std::equal(arr1, arr1+S, arr2);
+}
+
 
 using namespace PieceUtils;
 class Board {
@@ -31,7 +36,7 @@ private:
 	std::vector<unsigned int> historicHalfMoves;
 	unsigned int halfMoveClock = 0;
 	unsigned int fullMoveClock = 0;
-	std::array<Piece, 64> board = { 0 };
+	Piece board[64] = {0};
 	void ParseFEN(std::string FEN);
 public:
 	Board();
@@ -45,6 +50,7 @@ public:
 		blockerSquare = -1;
 	std::array<std::array<bool, 2>, 2 > castleRights = { {{true, true}, {true, true}} }; // k, q, K, Q
 	const std::vector<Move>& GetLegalMoves();
+	const std::vector<Move> GetCaptures();
 	void MakeMove(Move move);
 	void MoveBlocker(Square newBlockerSquare);
 	void ForceMakeMove(Move move);
@@ -64,12 +70,14 @@ public:
 	bool isDraw();
 	bool isInCheck(bool whoIs) const;
 	bool isCheckMate();
+	bool isKingCapturd() const;
+	bool wasProomtion() const;
 	Zobrist getZobristKey() const;
-	const std::array<Piece, 64>& GetBoard() const;
+	std::array<Piece, 64> GetBoard() const;
 
 	bool operator==(const Board& other) {
 		auto rs = ply_count == other.ply_count;
-		rs &= compareArrays(board, other.board);
+		rs &= compareArrays<Piece, 64>(board, other.board);
 		rs &= epSquare == other.epSquare;
 		rs &= compareArrays(castleRights.at(1), other.castleRights.at(1));
 		rs &= compareArrays(castleRights.at(0), other.castleRights.at(0));
