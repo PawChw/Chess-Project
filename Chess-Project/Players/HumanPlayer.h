@@ -5,6 +5,10 @@
 #include "../Game.h"
 #include "../Chess.h"
 
+enum class TryMoveResoult {
+    INVALID = 0, VALID, PROMOTION
+};
+
 class HumanPlayer :
     public IBlockerPlayer
 {
@@ -13,16 +17,16 @@ private:
     Move toMake = NullMove;
     Square toMoveBlocker = -1;
     Bitboard notAvailableSquares = 0;
-    PieceType triggerPromotion();
     std::vector<Move> legalMoves;
     Board board;
 public:
+    PieceType promotionPiece = Queen;
     std::mutex m;
     std::atomic_bool move = false, blockerMove = false;
     HumanPlayer() = default;
     Move Think(Board bd) override;
     Square ThinkBlocker(Board bd) override;
-    bool TryMove(Square from, Square to);
+    TryMoveResoult TryMove(Square from, Square to, PieceType promotedTo = None);
     bool TryMoveBlocker(Square to);
     bool TryMove();
     bool TryMoveBlocker();

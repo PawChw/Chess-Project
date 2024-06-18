@@ -5,7 +5,7 @@
 #include <array>
 #include <mutex>
 #include <queue>
-#include <unordered_map>
+#include <map>
 #include <chrono>
 #include "../Game.h"
 #include "../Chess.h"
@@ -65,15 +65,19 @@ private:
     int16_t eg_table[(PieceUtils::King | PieceUtils::White) + 1][64];
     //threading specific
     std::mutex alpha_mutex, beta_mutex, ev_mutex, best_move_mutex;
-    std::unordered_map<Zobrist, std::recursive_mutex> evaluatedPositions;
+    std::map<Zobrist, std::recursive_mutex> evaluatedPositions;
     std::atomic_int moveIndex;
+    std::chrono::system_clock::time_point force_terminate;
+    int NegaMaxThreadMaster(Board& bd, int alpha, int beta, int depth);
     void NegaMaxThread(Board bd, int& alpha, int& beta, int depth, const std::vector<Move>& legalMoves, Move& bestMove, transpositionFlag& bestFlag, int& bestValue);
     int NegaMax(Board& bd, int alpha, int beta, int depth);
     int NegaScout(Board& bd, int alpha, int beta, int depth);
     int quiesce(Board& bd, int alpha, int beta, int checks = 0);
     std::vector<Move> filterSilentMoves(Board& bd, std::vector<Move> moves);
+    std::vector<Move> moves;
 
 public:
+    int number_of_threads = 4;
     const static int16_t mg_pawn_table[64];
     const static int16_t eg_pawn_table[64];
     const static int16_t mg_knight_table[64];
@@ -87,7 +91,7 @@ public:
     const static int16_t mg_king_table[64];
     const static int16_t eg_king_table[64];
     int Eval(Board& bd) const;
-	ComputerPlayer(uint8_t max_depth = 5, Clock maxTime = std::chrono::seconds(20000), int qseDepth = 3);
+	ComputerPlayer(uint8_t max_depth = 8, Clock maxTime = std::chrono::seconds(5), int qseDepth = 3);
 	Square ThinkBlocker(Board bd) override;
 	Move Think(Board bd) override;
 	~ComputerPlayer();

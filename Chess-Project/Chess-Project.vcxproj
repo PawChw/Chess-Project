@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -94,10 +94,10 @@
     <ClCompile Include="Game\BlockerGame.cpp" />
     <ClCompile Include="Game\Game.cpp" />
     <ClCompile Include="Players\CompuerPlayer.cpp" />
-    <ClCompile Include="Players\CompuerPlayer1.cpp" />
     <ClCompile Include="Players\HumanPlayer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="UI\BoardView.cpp" />
+    <ClCompile Include="UI\Button.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Board.png" />
@@ -126,6 +126,7 @@
     <Image Include="Assets\Pieces\Default\wp.png" />
     <Image Include="Assets\Pieces\Default\wq.png" />
     <Image Include="Assets\Pieces\Default\wr.png" />
+    <Image Include="Assets\PromotionBg.png" />
     <Image Include="UI\Assets\Pieces\Default\bb.png" />
     <Image Include="UI\Assets\Pieces\Default\bk.png" />
     <Image Include="UI\Assets\Pieces\Default\bn.png" />
@@ -164,10 +165,11 @@
     <ClInclude Include="Game\Player\IBlockerPlayer.h" />
     <ClInclude Include="Game\Player\IPlayer.h" />
     <ClInclude Include="Players\CompuerPlayer.h" />
-    <ClInclude Include="Players\CompuerPlayer1.h" />
     <ClInclude Include="Players\HumanPlayer.h" />
     <ClInclude Include="UI\BoardView.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="UI\Button.h" />
+    <ClInclude Include="UI\Common.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Assets\Roboto-Regular.ttf" />

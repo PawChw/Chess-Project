@@ -18,29 +18,32 @@ sf::Texture BoardView::duck;
 void BoardView::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	target.draw(board);
-	for (auto shape : *pieces) {
+	for (auto& shape : *pieces) {
 		target.draw(shape);
 	}
-	for (auto shape : *moves) {
+	for (auto& shape : *moves) {
 		target.draw(shape);
+	}
+	if (promotionMove != NullMove) {
+		target.draw(promotionbg);
+		for (auto& shape : promotions) {
+			target.draw(shape);
+		}
 	}
 }
 
-BoardView::BoardView(sf::Vector2f pos, float size, Players white, Players black, bool withBlockers) : size(size), pos(pos) {
+BoardView::BoardView(sf::Vector2f pos, float size, std::shared_ptr<IBlockerPlayer> white, std::shared_ptr<IBlockerPlayer> black, bool withBlockers) : size(size), pos(pos), white(white), black(black) {
 	loadTextures();
 	board = sf::RectangleShape(sf::Vector2f{ size ,size });
+	promotionbg = sf::RectangleShape(sf::Vector2f{ size ,size/4 });
 	boardTexture.loadFromFile("Assets/board.png");
+	promotionTexture.loadFromFile("Assets/PromotionBg.png");
 	board.setPosition(pos);
 	board.setTexture(&boardTexture);
-	if (white == Players::HumanPlayer)
-		this->white = std::make_shared<HumanPlayer>();
-	else
-		this->white = std::make_shared<ComputerPlayer>();
-
-	if (black == Players::HumanPlayer)
-		this->black = std::make_shared<HumanPlayer>();
-	else
-		this->black = std::make_shared<ComputerPlayer>();
+	promotionbg.setPosition(pos);
+	promotionbg.setTexture(&promotionTexture);
+	sizeOrPosChanged = true;
+	promotions.fill(sf::RectangleShape(sf::Vector2f{ size / 4, size / 4 }));
 	if (withBlockers)
 		game = std::make_unique<BlockerGame>(this->white, this->black);
 	else
@@ -92,6 +95,20 @@ void BoardView::Update()
 					moves->push_back(circle);
 				}
 			}
+			if (selectedChanged && promotionMove != NullMove) {
+				if (game->bd.isWhiteToMove) {
+					promotions[0].setTexture(&whiteKnight);
+					promotions[1].setTexture(&whiteBishop);
+					promotions[2].setTexture(&whiteRook);
+					promotions[3].setTexture(&whiteQueen);
+				}
+				else {
+					promotions[0].setTexture(&blackKnight);
+					promotions[1].setTexture(&blackBishop);
+					promotions[2].setTexture(&blackRook);
+					promotions[3].setTexture(&blackQueen);
+				}
+			}
 		}
 		else if (toMoveBlocker) {
 			Bitboard available = ~(game->bd.getAllPiecesBitboard());
@@ -136,6 +153,16 @@ void BoardView::Update()
 			pieces->push_back(square);
 		}
 		game->stateChanged = false;
+	}
+	if (sizeOrPosChanged) {
+		float promSize = size / 4;
+		promotionbg.setPosition(pos);
+		promotionbg.setSize(sf::Vector2f{size, promSize});
+		for (int i = 0; i < promotions.size(); i++) {
+			auto& prom = promotions[i];
+			prom.setPosition(sf::Vector2f{ pos.x + promSize * i, pos.y });
+			prom.setSize(sf::Vector2f{ promSize, promSize });
+		}
 		sizeOrPosChanged = false;
 	}
 }
@@ -161,7 +188,6 @@ void BoardView::HandleMousePress(sf::Event::MouseButtonEvent& e, sf::RenderTarge
 	auto check = HandlerCheck(e.x, e.y, target);
 	if (!check.isOk) return;
 	int squareSize = size / 8;
-	int newSelected = ((e.y / squareSize) << 3) | (e.x / squareSize);
 	HumanPlayer* toMove = nullptr;
 	HumanPlayer* toMoveBlocker = nullptr;
 	if (auto d = dynamic_cast<HumanPlayer*>(white.get()); d != nullptr)
@@ -174,7 +200,23 @@ void BoardView::HandleMousePress(sf::Event::MouseButtonEvent& e, sf::RenderTarge
 		if (d->move) toMove = d;
 		if (d->blockerMove) toMoveBlocker = d;
 	}
+	int newSelected = ((static_cast<int>(check.loacalPos.y) / squareSize) << 3) | (static_cast<int>(check.loacalPos.x) / squareSize);
+	int selectorSize = size / 4;
 	if (toMove) {
+		if (promotionMove != NullMove && check.loacalPos.y < selectorSize) {
+			PieceType selector = static_cast<PieceType>(check.loacalPos.x / selectorSize + 2);
+			if (selector > Pawn && selector < King) {
+				toMove->TryMove(promotionMove.from, promotionMove.to, selector);
+				selected = -1;
+				promotionMove = NullMove;
+				selectedChanged = true;
+				return;
+			}
+		}
+		else {
+			promotionMove = NullMove;
+			selectedChanged = true;
+		}
 		if (selected == -1) {
 			selected = newSelected;
 			selectedChanged = true;
@@ -184,13 +226,16 @@ void BoardView::HandleMousePress(sf::Event::MouseButtonEvent& e, sf::RenderTarge
 			selectedChanged = true;
 		}
 		else {
-			for (auto mv : legalMoves) {
-				if (mv.to == newSelected && mv.from == selected) {
-					toMove->TryMove(mv.from, mv.to);
-					selected = -1;
-					selectedChanged = true;
-					return;
-				}
+			auto rs = toMove->TryMove(selected, newSelected);
+			if (rs == TryMoveResoult::VALID) {
+				selected = -1;
+				selectedChanged = true;
+				return;
+			}
+			else if (rs == TryMoveResoult::PROMOTION) {
+				promotionMove = { 0,static_cast<uint8_t>(selected),static_cast<uint8_t>(newSelected), 0 };
+				selectedChanged = true;
+				return;
 			}
 			selected = newSelected;
 			selectedChanged = true;
@@ -254,6 +299,7 @@ void BoardView::loadTextures()
 
 BoardView::~BoardView()
 {
+
 }
 
 void BoardView::setPosition(sf::Vector2f pos)
@@ -263,11 +309,21 @@ void BoardView::setPosition(sf::Vector2f pos)
 	sizeOrPosChanged = true;
 }
 
+sf::Vector2f BoardView::getPosition()
+{
+	return pos;
+}
+
 void BoardView::setSize(float size)
 {
 	this->size = size;
 	this->board.setSize(sf::Vector2f{ size,size });
 	sizeOrPosChanged = true;
+}
+
+float BoardView::getSize()
+{
+	return size;
 }
 
 
