@@ -1,8 +1,10 @@
 #pragma once
 #include <atomic>
 #include <cstdint>
+#include <stdexcept>
 #include<thread>
 #include<chrono>
+#include<SFML/Audio.hpp>
 #include "../Chess.h"
 
 enum class Winner : uint8_t {
@@ -26,8 +28,11 @@ public:
 	bool player1isWhite = true;
 	int player1 = 0, player2 = 0, draw = 0;
 	GameTerminalState rs = GameTerminalState();
-	IGame() : bd(Board()) {}
+	IGame() : bd(Board()) {
+	}
 	IGame(Board bd) : bd(bd) {}
+	sf::SoundBuffer capture, castle, check, move;
+	sf::Sound audioPlayer;
 	virtual GameTerminalState StartGame() = 0;
 	virtual GameTerminalState RestartGame() = 0;
 	virtual ~IGame() = default;
