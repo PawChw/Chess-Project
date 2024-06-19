@@ -1,5 +1,5 @@
 #include "CompuerPlayer.h"
-const int16_t ComputerPlayer::mg_pawn_table[64] = {
+const int ComputerPlayer::mg_pawn_table[64] = {
       0,   0,   0,   0,   0,   0,  0,   0,
      98, 134,  61,  95,  68, 126, 34, -11,
      -6,   7,  26,  31,  65,  56, 25, -20,
@@ -9,7 +9,7 @@ const int16_t ComputerPlayer::mg_pawn_table[64] = {
     -35,  -1, -20, -23, -15,  24, 38, -22,
       0,   0,   0,   0,   0,   0,  0,   0,
 };
-const int16_t ComputerPlayer::eg_pawn_table[64] = {
+const int ComputerPlayer::eg_pawn_table[64] = {
       0,   0,   0,   0,   0,   0,   0,   0,
     178, 173, 158, 134, 147, 132, 165, 187,
      94, 100,  85,  67,  56,  53,  82,  84,
@@ -19,7 +19,7 @@ const int16_t ComputerPlayer::eg_pawn_table[64] = {
      13,   8,   8,  10,  13,   0,   2,  -7,
       0,   0,   0,   0,   0,   0,   0,   0,
 };
-const int16_t ComputerPlayer::mg_knight_table[64] = {
+const int ComputerPlayer::mg_knight_table[64] = {
     -167, -89, -34, -49,  61, -97, -15, -107,
      -73, -41,  72,  36,  23,  62,   7,  -17,
      -47,  60,  37,  65,  84, 129,  73,   44,
@@ -29,7 +29,7 @@ const int16_t ComputerPlayer::mg_knight_table[64] = {
      -29, -53, -12,  -3,  -1,  18, -14,  -19,
     -105, -21, -58, -33, -17, -28, -19,  -23,
 };
-const int16_t ComputerPlayer::eg_knight_table[64] = {
+const int ComputerPlayer::eg_knight_table[64] = {
     -58, -38, -13, -28, -31, -27, -63, -99,
     -25,  -8, -25,  -2,  -9, -25, -24, -52,
     -24, -20,  10,   9,  -1,  -9, -19, -41,
@@ -39,7 +39,7 @@ const int16_t ComputerPlayer::eg_knight_table[64] = {
     -42, -20, -10,  -5,  -2, -20, -23, -44,
     -29, -51, -23, -15, -22, -18, -50, -64,
 };
-const int16_t ComputerPlayer::mg_bishop_table[64] = {
+const int ComputerPlayer::mg_bishop_table[64] = {
     -29,   4, -82, -37, -25, -42,   7,  -8,
     -26,  16, -18, -13,  30,  59,  18, -47,
     -16,  37,  43,  40,  35,  50,  37,  -2,
@@ -49,7 +49,7 @@ const int16_t ComputerPlayer::mg_bishop_table[64] = {
       4,  15,  16,   0,   7,  21,  33,   1,
     -33,  -3, -14, -21, -13, -12, -39, -21,
 };
-const int16_t ComputerPlayer::eg_bishop_table[64] = {
+const int ComputerPlayer::eg_bishop_table[64] = {
     -14, -21, -11,  -8, -7,  -9, -17, -24,
      -8,  -4,   7, -12, -3, -13,  -4, -14,
       2,  -8,   0,  -1, -2,   6,   0,   4,
@@ -59,7 +59,7 @@ const int16_t ComputerPlayer::eg_bishop_table[64] = {
     -14, -18,  -7,  -1,  4,  -9, -15, -27,
     -23,  -9, -23,  -5, -9, -16,  -5, -17,
 };
-const int16_t ComputerPlayer::mg_rook_table[64] = {
+const int ComputerPlayer::mg_rook_table[64] = {
      32,  42,  32,  51, 63,  9,  31,  43,
      27,  32,  58,  62, 80, 67,  26,  44,
      -5,  19,  26,  36, 17, 45,  61,  16,
@@ -69,7 +69,7 @@ const int16_t ComputerPlayer::mg_rook_table[64] = {
     -44, -16, -20,  -9, -1, 11,  -6, -71,
     -19, -13,   1,  17, 16,  7, -37, -26,
 };
-const int16_t ComputerPlayer::eg_rook_table[64] = {
+const int ComputerPlayer::eg_rook_table[64] = {
     13, 10, 18, 15, 12,  12,   8,   5,
     11, 13, 13, 11, -3,   3,   8,   3,
      7,  7,  7,  5,  4,  -3,  -5,  -3,
@@ -79,7 +79,7 @@ const int16_t ComputerPlayer::eg_rook_table[64] = {
     -6, -6,  0,  2, -9,  -9, -11,  -3,
     -9,  2,  3, -1, -5, -13,   4, -20,
 };
-const int16_t ComputerPlayer::mg_queen_table[64] = {
+const int ComputerPlayer::mg_queen_table[64] = {
     -28,   0,  29,  12,  59,  44,  43,  45,
     -24, -39,  -5,   1, -16,  57,  28,  54,
     -13, -17,   7,   8,  29,  56,  47,  57,
@@ -89,7 +89,7 @@ const int16_t ComputerPlayer::mg_queen_table[64] = {
     -35,  -8,  11,   2,   8,  15,  -3,   1,
      -1, -18,  -9,  10, -15, -25, -31, -50,
 };
-const int16_t ComputerPlayer::eg_queen_table[64] = {
+const int ComputerPlayer::eg_queen_table[64] = {
      -9,  22,  22,  27,  27,  19,  10,  20,
     -17,  20,  32,  41,  58,  25,  30,   0,
     -20,   6,   9,  49,  47,  35,  19,   9,
@@ -99,7 +99,7 @@ const int16_t ComputerPlayer::eg_queen_table[64] = {
     -22, -23, -30, -16, -16, -23, -36, -32,
     -33, -28, -22, -43,  -5, -32, -20, -41,
 };
-const int16_t ComputerPlayer::mg_king_table[64] = {
+const int ComputerPlayer::mg_king_table[64] = {
     -65,  23,  16, -15, -56, -34,   2,  13,
      29,  -1, -20,  -7,  -8,  -4, -38, -29,
      -9,  24,   2, -16, -20,   6,  22, -22,
@@ -109,7 +109,7 @@ const int16_t ComputerPlayer::mg_king_table[64] = {
       1,   7,  -8, -64, -43, -16,   9,   8,
     -15,  36,  12, -54,   8, -28,  24,  14,
 };
-const int16_t ComputerPlayer::eg_king_table[64] = {
+const int ComputerPlayer::eg_king_table[64] = {
     -74, -35, -18, -18, -11,  15,   4, -17,
     -12,  17,  14,  17,  17,  38,  23,  11,
      10,  17,  23,  15,  20,  45,  44,  13,
@@ -139,6 +139,11 @@ Move ComputerPlayer::Think(Board bd)
 
 int ComputerPlayer::NegaMax(Board& bd, int alpha, int beta, int depth)
 {
+    if (bd.IsCheckMate() || bd.IsKingCapturd()) return -checkmate+bd.ply_count;
+    if (bd.IsDraw()) {
+        if (Eval(bd) < -2000) return 100;
+        return -100;
+    }
     Zobrist zobrist = bd.GetZobristKey();
     auto& tt = transposition->at(mask & zobrist);
     if (tt.hash == zobrist && tt.depth >= depth) {
@@ -146,17 +151,11 @@ int ComputerPlayer::NegaMax(Board& bd, int alpha, int beta, int depth)
         if (tt.flag == TranspositionFlag::UPPERBOUND && tt.eval >= beta) return tt.eval;
         if (tt.flag == TranspositionFlag::LOWERBOUND && tt.eval <= alpha) return tt.eval;
     }
-    int bestVal = -checkmate - bd.ply_count;
-    int value = bestVal;
     if (depth == 0) {
         return Quiesce(bd, alpha, beta);
     }
-    if (bd.IsCheckMate() || bd.IsKingCapturd()) return bestVal;
-    if (bd.IsDraw()) {
-        value = Eval(bd);
-        if (value < -1000) return 100;
-        return -1000;
-    }
+    int bestVal = -checkmate - bd.ply_count;
+    int value = bestVal;
     std::vector<Move> m_moves = bd.GetLegalMoves();
     std::sort(m_moves.begin(), m_moves.end(), [this, zobrist](const Move& mx, const Move& my)->bool {
         int xval = GetPieceType(mx.captured_piece) + GetPieceType(mx.promoted_to_piece_type) - GetPieceType(mx.moved_piece);
@@ -182,7 +181,7 @@ int ComputerPlayer::NegaMax(Board& bd, int alpha, int beta, int depth)
         bd.ForceMakeMove(move);
         value = -NegaScout(bd, -(alpha+1), -alpha, depth - 1);
         if (value > alpha && value < beta)
-            value = -NegaMax(bd, -beta, -alpha, depth - 1);
+            value = -NegaMax(bd, -beta, -alpha, depth - 1) + (move.is_castle.toBool() ? 100 : 0);
         bd.UndoMove();
         if (value >= beta) {
             bestVal = value;
@@ -208,17 +207,16 @@ int ComputerPlayer::NegaMax(Board& bd, int alpha, int beta, int depth)
 
 int ComputerPlayer::NegaScout(Board& bd, int alpha, int beta, int depth)
 {
+    if (bd.IsCheckMate() || bd.IsKingCapturd()) return -checkmate + bd.ply_count;
+    if (bd.IsDraw()) {
+        if (Eval(bd) < -1000) return 100;
+        return -1000;
+    }
     Zobrist zobrist = bd.GetZobristKey();
     int bestVal = -checkmate - bd.ply_count;
     int value = bestVal;
     if (depth == 0) {
         return Eval(bd);
-    }
-    if (bd.IsCheckMate()) return bestVal;
-    if (bd.IsDraw()) {
-        value = Eval(bd);
-        if (value < -1000) return 100;
-        return -1000;
     }
     std::vector<Move> m_moves = bd.GetLegalMoves();
     std::sort(m_moves.begin(), m_moves.end(), [this, zobrist](const Move& mx, const Move& my)->bool {
@@ -259,15 +257,16 @@ int ComputerPlayer::NegaScout(Board& bd, int alpha, int beta, int depth)
 
 int ComputerPlayer::Quiesce(Board& bd, int alpha, int beta, int checks)
 {
-    Zobrist zobrist = bd.GetZobristKey();
-    auto& tt = transposition->at(mask & zobrist);
-    if (tt.hash == zobrist && tt.depth >= max_depth + qseDepth - checks) {
-        return tt.eval;
-    }
+    if (bd.IsCheckMate() || bd.IsKingCapturd()) return -checkmate + bd.ply_count;
     int standPat = Eval(bd);
     if (bd.IsDraw()) {
         if (standPat < -1000) return 100;
         return -1000;
+    }
+    Zobrist zobrist = bd.GetZobristKey();
+    auto& tt = transposition->at(mask & zobrist);
+    if (tt.hash == zobrist && tt.depth >= max_depth + qseDepth - checks) {
+        return tt.eval;
     }
     if (standPat >= beta) {
         return beta;
@@ -320,6 +319,11 @@ int ComputerPlayer::Quiesce(Board& bd, int alpha, int beta, int checks)
     return alpha;
 }
 
+inline int ComputerPlayer::Clamp(int min, int max, int val)
+{
+    return (val > max ? max : (val < min ? min : val));
+}
+
 std::vector<Move> ComputerPlayer::FilterSilentMoves(Board& bd, std::vector<Move> m_moves)
 {
     std::vector<Move> captures;
@@ -354,41 +358,40 @@ std::vector<Move> ComputerPlayer::FilterSilentMoves(Board& bd, std::vector<Move>
 
 int ComputerPlayer::Eval(Board& bd) const
 {
-    if (bd.IsCheckMate() || bd.IsKingCapturd()) return -checkmate + bd.ply_count;
-    if (bd.IsDraw()) return -checkmate / 10;
-	int val = 0, mg=0, eg=0, mg_progress = 0;
-	int attacks, index, eg_progress;
-    bool isWhite = true;
-    auto pvals = piece_vals;
-	Bitboard tmp;
-	for (Bitboard side : {bd.GetWhiteBitboard(), bd.GetBlackBitboard()}) {
-		attacks = 0;
-        auto pvals = piece_vals;
-		for (PieceType p = Pawn; p <= King; p++) {
-			tmp = bd.GetBitboard(p) & side;
-            if (p == Pawn) {
-                int pwns = BitboardHelpers::GetNumOfBitsSet(tmp) - 5;
-                pvals[Knight] += pwns * 6;
-                pvals[Rook] -= pwns * 13;
-            }
-            else if (p == Bishop && BitboardHelpers::GetNumOfBitsSet(tmp) > 1) val += 50;
-			while (tmp) {
-				index = BitboardHelpers::GetAndClearIndexOfLSB(tmp);
-				val += pvals[p];
-                mg_progress += mg_increment[p];
-                mg+=mg_table[p | (isWhite ? PieceUtils::White : 0)][index];
-                eg+=eg_table[p | (isWhite ? PieceUtils::White : 0)][index];
-			}
-		}
-		val = -val;
-        mg = -mg;
+    int mgProgress = 0, egProgress, val=0, mg=0, eg=0, attacks;
+
+    for (bool side : {true, false}) {
+        attacks = 0;
+        Bitboard safety = GetKingSafety(side, bd);
+        Bitboard pieces = side ? bd.GetWhiteBitboard() : bd.GetBlackBitboard();
+        while (pieces) {
+            Square square = BitboardHelpers::GetAndClearIndexOfLSB(pieces);
+            Piece piece = bd.GetPieceOnSquare(square);
+            attacks += BitboardHelpers::GetNumOfBitsSet(bd.GetPieceAttacks(piece, square) & safety) * atk_vals[GetPieceType(piece)];
+            mg += mg_table[piece & 15][square] + piece_vals[GetPieceType(piece)];
+            eg += eg_table[piece & 15][square] + piece_vals[GetPieceType(piece)+6];
+        }
+        mg = -mg-SafetyTable[Clamp(0,61, attacks)];
         eg = -eg;
-        isWhite = !isWhite;
-	}
-    if(mg_progress>24) mg_progress = 24;
-    eg_progress = 24 - mg_progress;
-    int KingsDistance = std::abs(GetFile(bd.white_king) - GetFile(bd.black_king)) + std::abs(GetRank(bd.white_king) - GetRank(bd.black_king));
-    return (val + (mg * mg_progress + eg * eg_progress) / 24)*(bd.is_white_to_move ? 1 : -1)+KingsDistance*mg_progress-KingsDistance*eg_progress;
+    }
+   
+    if(mgProgress>24) mgProgress = 24;
+    egProgress = 24 - mgProgress;
+    val += (mg * mgProgress + eg * egProgress) / 24;
+    return val * (bd.is_white_to_move ? 1 : -1);
+}
+
+Bitboard ComputerPlayer::GetKingSafety(bool side, Board& bd) const {
+    int i = bd.is_white_to_move ? bd.white_king : bd.black_king;
+    Bitboard kingSafety = GetKingMoves(i, (i + 32) % 64);
+    BitboardHelpers::SetBit(kingSafety, i);
+    if (bd.is_white_to_move) {
+        kingSafety |= kingSafety >> 16;
+    }
+    else {
+        kingSafety |= kingSafety << 16;
+    }
+    return kingSafety;
 }
 
 ComputerPlayer::ComputerPlayer(uint8_t max_depth, Clock desired_time, int qseDepth) : max_depth(max_depth), desired_time(desired_time), qseDepth(qseDepth)
