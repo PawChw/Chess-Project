@@ -15,7 +15,7 @@ public:
 	void HandleMouseRealease(sf::Event::MouseButtonEvent& e, sf::RenderTarget& target);
 	void HandleMousePress(sf::Event::MouseButtonEvent& e, sf::RenderTarget& target);
 	bool Click();
-	void setPosition(sf::Vector2f pos);
-	void setSize(sf::Vector2f size);
+	void SetPosition(sf::Vector2f m_pos);
+	void SetSize(sf::Vector2f m_size);
 	void setString(const std::string& string);
 };

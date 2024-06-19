@@ -1,8 +1,8 @@
 #include "ZobristKey.h"
 
-std::once_flag ZobristKey::initFlag;
+std::once_flag ZobristKey::m_init_flag;
 std::array<std::array<Zobrist, 64>, 12> ZobristKey::hashes;
-Zobrist ZobristKey::blackToMove;
+Zobrist ZobristKey::black_to_move;
 
 void ZobristKey::InitOnce() {
 	std::mt19937_64 rng(static_cast<std::mt19937_64::result_type>(
@@ -13,19 +13,19 @@ void ZobristKey::InitOnce() {
 			square = dist(rng);
 		}
 	}
-	blackToMove = dist(rng);
+	black_to_move = dist(rng);
 }
 
 void ZobristKey::Init() {
-	std::call_once(initFlag, InitOnce);
+	std::call_once(m_init_flag, InitOnce);
 }
 
 Zobrist ZobristKey::Compute(std::array<Bitboard, 12> bitboards, bool isBlacksTurn) {
-	Zobrist value = isBlacksTurn ? blackToMove : 0ull;
+	Zobrist value = isBlacksTurn ? black_to_move : 0ull;
 	for (int i = 0; i < 12; i++) {
 		Bitboard bb = bitboards[i];
 		while (static_cast<bool>(bb)) {
-			value ^= hashes[i][BitboardHelpers::getAndClearIndexOfLSB(bb)];
+			value ^= hashes[i][BitboardHelpers::GetAndClearIndexOfLSB(bb)];
 		}
 	}
 	return value;
@@ -40,9 +40,9 @@ Zobrist ZobristKey::GetMove(Zobrist old, Square from, Square to, Piece piece, bo
 
 void ZobristKey::Move(Zobrist& old, Square from, Square to, Piece piece, bool changeMover)
 {
-	int pieceIndex = PieceUtils::getPieceType(piece) - 1;
-	if (PieceUtils::getColor(piece) == PieceUtils::Black) pieceIndex += 6;
-	if (changeMover) old ^= blackToMove;
+	int pieceIndex = PieceUtils::GetPieceType(piece) - 1;
+	if (PieceUtils::GetColor(piece) == PieceUtils::Black) pieceIndex += 6;
+	if (changeMover) old ^= black_to_move;
 	old ^= hashes[pieceIndex][from];
 	old ^= hashes[pieceIndex][to];
 }

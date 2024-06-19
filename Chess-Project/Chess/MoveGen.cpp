@@ -4,28 +4,28 @@
 inline Bitboard GetKingMoves(Square square, Square enemyKing)
 {
 	Bitboard possibleMoves = 0ull;
-	Coords startPos = Coords::fromSquareIndex(square);
+	Coords startPos = Coords::FromSquareIndex(square);
 	Coords temp;
 	for (auto& dir : orthagonal) {
 		temp = startPos + dir;
-		if (temp.isValid())
-			BitboardHelpers::setBit(possibleMoves, temp.toSquareIndex());
+		if (temp.IsValid())
+			BitboardHelpers::SetBit(possibleMoves, temp.ToSquareIndex());
 	}
 	for (auto& dir : diagonal) {
 		temp = startPos + dir;
-		if (temp.isValid())
-			BitboardHelpers::setBit(possibleMoves, temp.toSquareIndex());
+		if (temp.IsValid())
+			BitboardHelpers::SetBit(possibleMoves, temp.ToSquareIndex());
 	}
-	startPos = Coords::fromSquareIndex(enemyKing);
+	startPos = Coords::FromSquareIndex(enemyKing);
 	for (auto& dir : orthagonal) {
 		temp = startPos + dir;
-		if (temp.isValid())
-			BitboardHelpers::clearBit(possibleMoves, temp.toSquareIndex());
+		if (temp.IsValid())
+			BitboardHelpers::ClearBit(possibleMoves, temp.ToSquareIndex());
 	}
 	for (auto& dir : diagonal) {
 		temp = startPos + dir;
-		if (temp.isValid())
-			BitboardHelpers::clearBit(possibleMoves, temp.toSquareIndex());
+		if (temp.IsValid())
+			BitboardHelpers::ClearBit(possibleMoves, temp.ToSquareIndex());
 	}
 	return possibleMoves;
 }
@@ -38,13 +38,13 @@ Bitboard GetQueenMoves(Square square, Bitboard blockers)
 Bitboard GetRookMoves(Square square, Bitboard blockers)
 {
 	Bitboard possibleMoves = 0ull;
-	Coords startPos = Coords::fromSquareIndex(square);
+	Coords startPos = Coords::FromSquareIndex(square);
 	Coords temp;
 	for (auto& dir : orthagonal) {
 		temp = startPos + dir;
-		while (temp.isValid()) {
-			BitboardHelpers::setBit(possibleMoves, temp.toSquareIndex());
-			if (BitboardHelpers::getBit(blockers, temp.toSquareIndex())) break;
+		while (temp.IsValid()) {
+			BitboardHelpers::SetBit(possibleMoves, temp.ToSquareIndex());
+			if (BitboardHelpers::GetBit(blockers, temp.ToSquareIndex())) break;
 			temp += dir;
 		}
 	}
@@ -54,13 +54,13 @@ Bitboard GetRookMoves(Square square, Bitboard blockers)
 Bitboard GetBishopMoves(Square square, Bitboard blockers)
 {
 	Bitboard possibleMoves = 0ull;
-	Coords startPos = Coords::fromSquareIndex(square);
+	Coords startPos = Coords::FromSquareIndex(square);
 	Coords temp;
 	for (auto& dir : diagonal) {
 		temp = startPos + dir;
-		while (temp.isValid()) {
-			BitboardHelpers::setBit(possibleMoves, temp.toSquareIndex());
-			if (BitboardHelpers::getBit(blockers, temp.toSquareIndex())) break;
+		while (temp.IsValid()) {
+			BitboardHelpers::SetBit(possibleMoves, temp.ToSquareIndex());
+			if (BitboardHelpers::GetBit(blockers, temp.ToSquareIndex())) break;
 			temp += dir;
 		}
 	}
@@ -70,12 +70,12 @@ Bitboard GetBishopMoves(Square square, Bitboard blockers)
 Bitboard GetKnightMoves(Square square)
 {
 	Bitboard possibleMoves = 0ull;
-	Coords startPos = Coords::fromSquareIndex(square);
+	Coords startPos = Coords::FromSquareIndex(square);
 	Coords temp;
 	for (auto& dir : knight) {
 		temp = startPos + dir;
-		if (temp.isValid()) {
-			BitboardHelpers::setBit(possibleMoves, temp.toSquareIndex());
+		if (temp.IsValid()) {
+			BitboardHelpers::SetBit(possibleMoves, temp.ToSquareIndex());
 		}
 	}
 	return possibleMoves;
@@ -85,7 +85,7 @@ Bitboard GetPawnMoves(Square square, Bitboard blockers, bool isWhite, Square epS
 {
 	Bitboard bb = GetPawnAttacks(square, isWhite);
 	if (!attacksOnly) {
-		if (isValidSquare(epSquare))
+		if (IsValidSquare(epSquare))
 			blockers |= 1ull << epSquare;
 		bb &= blockers;
 		bb |= GetPawnSilentMoves(square, blockers, isWhite);
@@ -97,15 +97,15 @@ Bitboard GetPawnSilentMoves(Square square, Bitboard blockers, bool isWhite)
 {
 	Bitboard possibleMoves = 0ull;
 	int8_t direction = isWhite ? -1 : 1;
-	Coords startPos = Coords::fromSquareIndex(square);
+	Coords startPos = Coords::FromSquareIndex(square);
 	Coords temp = startPos;
 	temp.rank += direction;
-	if (temp.isValid() && !BitboardHelpers::getBit(blockers, temp.toSquareIndex())) {
-		BitboardHelpers::setBit(possibleMoves, temp.toSquareIndex());
+	if (temp.IsValid() && !BitboardHelpers::GetBit(blockers, temp.ToSquareIndex())) {
+		BitboardHelpers::SetBit(possibleMoves, temp.ToSquareIndex());
 		if (startPos.rank == (isWhite ? 6 : 1)) {
 			temp.rank += direction;
-			if (temp.isValid() && !BitboardHelpers::getBit(blockers, temp.toSquareIndex()))
-				BitboardHelpers::setBit(possibleMoves, temp.toSquareIndex());
+			if (temp.IsValid() && !BitboardHelpers::GetBit(blockers, temp.ToSquareIndex()))
+				BitboardHelpers::SetBit(possibleMoves, temp.ToSquareIndex());
 		}
 	}
 
@@ -116,15 +116,15 @@ Bitboard GetPawnAttacks(Square square, bool isWhite)
 {
 	Bitboard possibleAttacks = 0ull;
 	int8_t direction = isWhite ? -1 : 1;
-	Coords startPos = Coords::fromSquareIndex(square);
+	Coords startPos = Coords::FromSquareIndex(square);
 	Coords temp = startPos;
 	temp.rank += direction;
 	temp.file += 1;
-	if (temp.isValid())
-		BitboardHelpers::setBit(possibleAttacks, temp.toSquareIndex());
+	if (temp.IsValid())
+		BitboardHelpers::SetBit(possibleAttacks, temp.ToSquareIndex());
 	temp.file -= 2;
-	if (temp.isValid())
-		BitboardHelpers::setBit(possibleAttacks, temp.toSquareIndex());
+	if (temp.IsValid())
+		BitboardHelpers::SetBit(possibleAttacks, temp.ToSquareIndex());
 	return possibleAttacks;
 }
 

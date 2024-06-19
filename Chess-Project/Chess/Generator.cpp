@@ -1,152 +1,141 @@
 #include "Generator.h"
 
-void Generator::seedBitboards()
+void Generator::SeedBitboards()
 {
 	for (bool side : {true, false}) {
 		for (PieceType i = Pawn; i <= King; i++) {
-			bitboards[static_cast<int>(side)][static_cast<int>(i)] = board.getBitboard(i, side ? White : Black);
+			bitboards[static_cast<int>(side)][static_cast<int>(i)] = m_board.GetBitboard(i, side ? White : Black);
 			bitboards[static_cast<int>(side)][0] |= bitboards[static_cast<int>(side)][static_cast<int>(i)];
 		}
 	}
-	if(isValidSquare(board.blockerSquare))
-		BitboardHelpers::setBit(bitboards[static_cast<int>(movesFor)][0], board.blockerSquare);
-	allPiecesBitboard = bitboards[0][0] | bitboards[1][0];
+	if(IsValidSquare(m_board.blocker_square))
+		BitboardHelpers::SetBit(bitboards[static_cast<int>(m_moves_for)][0], m_board.blocker_square);
+	m_all_pieces_bitboard = bitboards[0][0] | bitboards[1][0];
 }
 
-//Square interesetedIn = whoIs ? whiteKing : blackKing;
-//return isSquareAttacked(interesetedIn, !whoIs);
-// 
-//Square opposite = byWho ? whiteKing : blackKing;
-//Bitboard allPieces = getAllPiecesBitboard(), currCheckBtboard;
-//for (int i = 1; i < 7; i++) {
-//	currCheckBtboard = getBitboard(static_cast<PieceType>(i), byWho ? White : Black);
-//	Bitboard bb = GetPieceMoves(static_cast<PieceType>(i), square, opposite, allPieces, !byWho, epSquare, true);
-//	if (static_cast<bool>(bb & currCheckBtboard)) return true;
-//}
-//return false;
 
-bool Generator::checkMove(Move& move) const
+bool Generator::CheckMove(Move& move) const
 {
 	Square interesetedIn, capturedSquare = move.to;
-	PieceType movedPieceType = getPieceType(move.movedPiece),
-		capturedPiece = getPieceType(move.capturedPiece);
+	PieceType movedPieceType = GetPieceType(move.moved_piece),
+		captured_piece = GetPieceType(move.captured_piece);
 	if (movedPieceType == King) {
 		interesetedIn = move.to;
 	}
 	else {
-		interesetedIn = movesFor ? board.whiteKing : board.blackKing;
+		interesetedIn = m_moves_for ? m_board.white_king : m_board.black_king;
 	}
-	Bitboard blockers = allPiecesBitboard, attacksFromKingSquare, enemyPiecesOfSameType;
-	BitboardHelpers::clearBit(blockers, move.from);
-	if (capturedPiece && (movedPieceType == Pawn && move.to == board.epSquare)) {
-		capturedSquare = getSquare(GetFile(move.to), GetRank(move.from));
-		BitboardHelpers::clearBit(blockers, capturedSquare);
+	Bitboard blockers = m_all_pieces_bitboard, attacksFromKingSquare, enemyPiecesOfSameType;
+	BitboardHelpers::ClearBit(blockers, move.from);
+	if (captured_piece && (movedPieceType == Pawn && move.to == m_board.ep_square)) {
+		capturedSquare = GetSquare(GetFile(move.to), GetRank(move.from));
+		BitboardHelpers::ClearBit(blockers, capturedSquare);
 	}
-	BitboardHelpers::setBit(blockers, move.to);
+	BitboardHelpers::SetBit(blockers, move.to);
 	for (PieceType i = Pawn; i < King; i++) {
-		enemyPiecesOfSameType = bitboards[static_cast<int>(!movesFor)][static_cast<int>(i)];
-		if (i == capturedPiece) BitboardHelpers::clearBit(enemyPiecesOfSameType, capturedSquare);
-		attacksFromKingSquare = GetPieceMoves(i, interesetedIn, 0, blockers, movesFor, 0, true);
+		enemyPiecesOfSameType = bitboards[static_cast<int>(!m_moves_for)][static_cast<int>(i)];
+		if (i == captured_piece) BitboardHelpers::ClearBit(enemyPiecesOfSameType, capturedSquare);
+		attacksFromKingSquare = GetPieceMoves(i, interesetedIn, 0, blockers, m_moves_for, 0, true);
 		if (static_cast<bool>(attacksFromKingSquare & enemyPiecesOfSameType)) return false;
 	}
 	return true;
 }
 
-Generator::Generator(const Board& board): board(board), movesFor(board.isWhiteToMove)
+Generator::Generator(const Board& m_board): m_board(m_board), m_moves_for(m_board.is_white_to_move)
 {
-	seedBitboards();
+	SeedBitboards();
 }
 
-Generator::Generator(const Board& board, bool movesFor) : board(board), movesFor(movesFor)
+Generator::Generator(const Board& m_board, bool m_moves_for) : m_board(m_board), m_moves_for(m_moves_for)
 {
-	seedBitboards();
+	SeedBitboards();
 }
 
 std::vector<Move> Generator::GenerateLegalMoves(bool capturesOnly)
 {
 	const static std::array< std::array<Bitboard, 2>, 2> castleChecks = { { {96ull, 14ull}, {6917529027641081856ull, 1008806316530991104ull}} }; // K, Q, k, q
-	std::vector<Move> moves;
-	Bitboard tmp, movesbb, notOurBB = ~(bitboards[static_cast<int>(movesFor)][0]), enemyBB = bitboards[static_cast<int>(movesFor)][0];
-	Square ourKingSquare = movesFor ? board.whiteKing : board.blackKing, enemyKingSquare = movesFor ? board.blackKing : board.whiteKing;
-	Color c = movesFor ? White : Black;
+	std::vector<Move> m_moves;
+	Bitboard tmp, movesbb, notOurBB = ~(bitboards[static_cast<int>(m_moves_for)][0]), enemyBB = bitboards[static_cast<int>(m_moves_for)][0];
+	Square ourKingSquare = m_moves_for ? m_board.white_king : m_board.black_king, enemyKingSquare = m_moves_for ? m_board.black_king : m_board.white_king;
+	Color c = m_moves_for ? White : Black;
 	Move move{0};
-	move.epSquare = board.epSquare;
-	move.isCastle.set({ false, false });
+	move.ep_square = m_board.ep_square;
+	move.is_castle.Set({ false, false });
 	for (PieceType i = Pawn; i <= King; i++) {
-		tmp = bitboards[static_cast<int>(movesFor)][static_cast<int>(i)];
+		tmp = bitboards[static_cast<int>(m_moves_for)][static_cast<int>(i)];
 		while (static_cast<bool>(tmp)) {
-			move.from = BitboardHelpers::getAndClearIndexOfLSB(tmp);
-			movesbb = GetPieceMoves(i, move.from, enemyKingSquare, allPiecesBitboard, movesFor, board.epSquare, capturesOnly) & notOurBB;
-			if (capturesOnly) movesbb &= allPiecesBitboard;
-			move.movedPiece = c | i;
+			move.from = BitboardHelpers::GetAndClearIndexOfLSB(tmp);
+			movesbb = GetPieceMoves(i, move.from, enemyKingSquare, m_all_pieces_bitboard, m_moves_for, m_board.ep_square, capturesOnly) & notOurBB;
+			if (capturesOnly) movesbb &= m_all_pieces_bitboard;
+			move.moved_piece = c | i;
 			while (static_cast<bool>(movesbb)) {
-				move.to = BitboardHelpers::getAndClearIndexOfLSB(movesbb);
-				move.capturedPiece = board.getPieceOnSquare(move.to);
-				if (board.epSquare == move.to && getPieceType(move.movedPiece) == Pawn) {
-					move.capturedPiece = changeColor(move.movedPiece);
+				move.to = BitboardHelpers::GetAndClearIndexOfLSB(movesbb);
+				move.captured_piece = m_board.GetPieceOnSquare(move.to);
+				if (m_board.ep_square == move.to && GetPieceType(move.moved_piece) == Pawn) {
+					move.captured_piece = ChangeColor(move.moved_piece);
 				}
 
 				//castle rights
-				move.castleRightsLost.set({ false, false, false, false });
+				move.castle_rights_lost.Set({ false, false, false, false });
 				if (i == King) {
-					if (board.castleRights[static_cast<int>(movesFor)][0])
-						move.castleRightsLost.set(static_cast<int>(movesFor), 0, true);
-					if (board.castleRights[static_cast<int>(movesFor)][1])
-						move.castleRightsLost.set(static_cast<int>(movesFor), 1, true);
+					if (m_board.castle_rights[static_cast<int>(m_moves_for)][0])
+						move.castle_rights_lost.Set(static_cast<int>(m_moves_for), 0, true);
+					if (m_board.castle_rights[static_cast<int>(m_moves_for)][1])
+						move.castle_rights_lost.Set(static_cast<int>(m_moves_for), 1, true);
 				}
 				else if (i == Rook) {
-					if (board.castleRights[static_cast<int>(movesFor)][0] && move.from == ourKingSquare + 3)
-						move.castleRightsLost.set(static_cast<int>(movesFor), 0, true);
-					if (board.castleRights[static_cast<int>(movesFor)][1] && move.from == ourKingSquare - 4)
-						move.castleRightsLost.set(static_cast<int>(movesFor), 1, true);
+					if (m_board.castle_rights[static_cast<int>(m_moves_for)][0] && move.from == ourKingSquare + 3)
+						move.castle_rights_lost.Set(static_cast<int>(m_moves_for), 0, true);
+					if (m_board.castle_rights[static_cast<int>(m_moves_for)][1] && move.from == ourKingSquare - 4)
+						move.castle_rights_lost.Set(static_cast<int>(m_moves_for), 1, true);
 				}
-				if (getPieceType(move.capturedPiece) == Rook) {
-					if (board.castleRights[static_cast<int>(!movesFor)][0] && move.to == enemyKingSquare + 3)
-						move.castleRightsLost.set(static_cast<int>(!movesFor), 0, true);
-					if (board.castleRights[static_cast<int>(!movesFor)][1] && move.to == enemyKingSquare - 4)
-						move.castleRightsLost.set(static_cast<int>(!movesFor), 1, true);
+				if (GetPieceType(move.captured_piece) == Rook) {
+					if (m_board.castle_rights[static_cast<int>(!m_moves_for)][0] && move.to == enemyKingSquare + 3)
+						move.castle_rights_lost.Set(static_cast<int>(!m_moves_for), 0, true);
+					if (m_board.castle_rights[static_cast<int>(!m_moves_for)][1] && move.to == enemyKingSquare - 4)
+						move.castle_rights_lost.Set(static_cast<int>(!m_moves_for), 1, true);
 				}
 
 				//promotion check
-				if (i == Pawn && GetRank(move.to) == (movesFor ? 0 : 7)) {
+				if (i == Pawn && GetRank(move.to) == (m_moves_for ? 0 : 7)) {
 					for (PieceType j = Knight; j < King; j++) {
-						move.promotedToPieceType = j;
-						if (checkMove(move))
-							moves.push_back(move);
+						move.promoted_to_piece_type = j;
+						if (CheckMove(move))
+							m_moves.push_back(move);
 					}
 				}
 				else {
-					move.promotedToPieceType = None;
-					if (checkMove(move)) {
-						moves.push_back(move);
+					move.promoted_to_piece_type = None;
+					if (CheckMove(move)) {
+						m_moves.push_back(move);
 					}
 				}
 			}
 		}
 	}
-	move.capturedPiece = None;
-	move.castleRightsLost.set({ false, false, false, false });
-	move.castleRightsLost.set(static_cast<int>(movesFor), { board.castleRights[static_cast<int>(movesFor)][0], board.castleRights[static_cast<int>(movesFor)][1] });
-	if (board.castleRights[static_cast<int>(movesFor)][1]
-		&& !static_cast<bool>(allPiecesBitboard & castleChecks[static_cast<int>(movesFor)][1])
-		&& !board.isSquareAttacked(ourKingSquare, !movesFor)
-		&& !board.isSquareAttacked(ourKingSquare - 1, !movesFor)
-		&& !board.isSquareAttacked(ourKingSquare - 2, !movesFor)
-		&& !board.isSquareAttacked(ourKingSquare - 3, !movesFor)
-		&& !board.isSquareAttacked(ourKingSquare - 4, !movesFor)) {
+	move.captured_piece = None;
+	move.castle_rights_lost.Set({ false, false, false, false });
+	move.castle_rights_lost.Set(static_cast<int>(m_moves_for), { m_board.castle_rights[static_cast<int>(m_moves_for)][0], m_board.castle_rights[static_cast<int>(m_moves_for)][1] });
+	if (m_board.castle_rights[static_cast<int>(m_moves_for)][1]
+		&& !static_cast<bool>(m_all_pieces_bitboard & castleChecks[static_cast<int>(m_moves_for)][1])
+		&& !m_board.IsSquareAttacked(ourKingSquare, !m_moves_for)
+		&& !m_board.IsSquareAttacked(ourKingSquare - 1, !m_moves_for)
+		&& !m_board.IsSquareAttacked(ourKingSquare - 2, !m_moves_for)
+		&& !m_board.IsSquareAttacked(ourKingSquare - 3, !m_moves_for)
+		&& !m_board.IsSquareAttacked(ourKingSquare - 4, !m_moves_for)) {
 		move.to = ourKingSquare - 2;
-		move.isCastle.set({ false, true });
-		moves.push_back(move);
+		move.is_castle.Set({ false, true });
+		m_moves.push_back(move);
 	}
-	if (board.castleRights[static_cast<int>(movesFor)][0]
-		&& !static_cast<bool>(allPiecesBitboard & castleChecks[static_cast<int>(movesFor)][0])
-		&& !board.isSquareAttacked(ourKingSquare, !movesFor)
-		&& !board.isSquareAttacked(ourKingSquare + 1, !movesFor)
-		&& !board.isSquareAttacked(ourKingSquare + 2, !movesFor)
-		&& !board.isSquareAttacked(ourKingSquare + 3, !movesFor)) {
+	if (m_board.castle_rights[static_cast<int>(m_moves_for)][0]
+		&& !static_cast<bool>(m_all_pieces_bitboard & castleChecks[static_cast<int>(m_moves_for)][0])
+		&& !m_board.IsSquareAttacked(ourKingSquare, !m_moves_for)
+		&& !m_board.IsSquareAttacked(ourKingSquare + 1, !m_moves_for)
+		&& !m_board.IsSquareAttacked(ourKingSquare + 2, !m_moves_for)
+		&& !m_board.IsSquareAttacked(ourKingSquare + 3, !m_moves_for)) {
 		move.to = ourKingSquare + 2;
-		move.isCastle.set({ true, false });
-		moves.push_back(move);
+		move.is_castle.Set({ true, false });
+		m_moves.push_back(move);
 	}
-	return moves;
+	return m_moves;
 }

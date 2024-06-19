@@ -3,68 +3,68 @@
 
 Move HumanPlayer::Think(Board bd) {
 	std::unique_lock lk(m);
-	board = bd;
-	legalMoves = bd.GetLegalMoves();
-	toMake = NullMove;
-	toMoveBlocker = -1;
+	m_board = bd;
+	m_legal_moves = bd.GetLegalMoves();
+	m_to_move = NullMove;
+	to_move_blocker = -1;
 	move = true;
-	cv.wait(lk, [this] {return toMake != NullMove; });
-	legalMoves.clear();
+	m_cv.wait(lk, [this] {return m_to_move != NullMove; });
+	m_legal_moves.clear();
 	lk.unlock();
-	cv.notify_all();
-	return toMake;
+	m_cv.notify_all();
+	return m_to_move;
 }
 
 TryMoveResoult HumanPlayer::TryMove(Square from, Square to, PieceType promotedTo) {
 	if (!move) return TryMoveResoult::INVALID;
 	Move candidate = { 0 };
-	candidate.movedPiece = board.getPieceOnSquare(from);
+	candidate.moved_piece = m_board.GetPieceOnSquare(from);
 	candidate.from = from;
 	candidate.to = to;
 	int index;
-	if (getPieceType(candidate.movedPiece) == Pawn && GetRank(to) == (getColor(candidate.movedPiece) == White ? 0 : 7)) {
+	if (GetPieceType(candidate.moved_piece) == Pawn && GetRank(to) == (GetColor(candidate.moved_piece) == White ? 0 : 7)) {
 		if (!promotedTo) return TryMoveResoult::PROMOTION;
-		candidate.promotedToPieceType = promotedTo;
+		candidate.promoted_to_piece_type = promotedTo;
 	}
-	if (candidate.to == board.epSquare && getPieceType(candidate.movedPiece) == Pawn) candidate.capturedPiece = Pawn;
-	else candidate.capturedPiece = board.getPieceOnSquare(to);
-	index = findMove(legalMoves, candidate);
+	if (candidate.to == m_board.ep_square && GetPieceType(candidate.moved_piece) == Pawn) candidate.captured_piece = Pawn;
+	else candidate.captured_piece = m_board.GetPieceOnSquare(to);
+	index = FindMove(m_legal_moves, candidate);
 	if (index == -1) return TryMoveResoult::INVALID;
 	{
 		std::unique_lock lk(m);
-		toMake = legalMoves.at(index);
+		m_to_move = m_legal_moves.at(index);
 		move = false;
 	}
-	cv.notify_all();
+	m_cv.notify_all();
 	return TryMoveResoult::VALID;
 }
 
 Square HumanPlayer::ThinkBlocker(Board bd) {
 	std::unique_lock lk(m);
-	board = bd;
-	toMake = NullMove;
-	if(!legalMoves.empty())
-		legalMoves.clear();
-	toMoveBlocker = -1;
-	notAvailableSquares = bd.getAllPiecesBitboard();
-	BitboardHelpers::setBit(notAvailableSquares, bd.blockerSquare);
-	Bitboard av = ~notAvailableSquares;
-	blockerMove = true;
-	cv.wait(lk, [this] {return toMoveBlocker != -1; });
+	m_board = bd;
+	m_to_move = NullMove;
+	if(!m_legal_moves.empty())
+		m_legal_moves.clear();
+	to_move_blocker = -1;
+	m_not_available_squares = bd.GetAllPiecesBitboard();
+	BitboardHelpers::SetBit(m_not_available_squares, bd.blocker_square);
+	Bitboard av = ~m_not_available_squares;
+	blocker_move = true;
+	m_cv.wait(lk, [this] {return to_move_blocker != -1; });
 	lk.unlock();
-	cv.notify_all();
-	return toMoveBlocker;
+	m_cv.notify_all();
+	return to_move_blocker;
 }
 
 bool HumanPlayer::TryMoveBlocker(Square to) {
-	if (!blockerMove) return false;
-	if (BitboardHelpers::getBit(notAvailableSquares, to)) return false;
+	if (!blocker_move) return false;
+	if (BitboardHelpers::GetBit(m_not_available_squares, to)) return false;
 	{
 		std::unique_lock lk(m);
-		toMoveBlocker = to;
-		blockerMove = false;
+		to_move_blocker = to;
+		blocker_move = false;
 	}
-	cv.notify_all();
+	m_cv.notify_all();
 	return true;
 }
 
@@ -73,22 +73,22 @@ bool HumanPlayer::TryMove()
 	if (!move) return false;
 	{
 		std::unique_lock lk(m);
-		toMake = legalMoves.at(0);
+		m_to_move = m_legal_moves.at(0);
 		move = false;
 	}
-	cv.notify_all();
+	m_cv.notify_all();
 	return true;
 }
 
 bool HumanPlayer::TryMoveBlocker()
 {
-	if (!blockerMove) return false;
-	auto to = BitboardHelpers::getIndexOfFSB(~notAvailableSquares);
+	if (!blocker_move) return false;
+	auto to = BitboardHelpers::GetIndexOfFSB(~m_not_available_squares);
 	{
 		std::unique_lock lk(m);
-		toMoveBlocker = to;
-		blockerMove = false;
+		to_move_blocker = to;
+		blocker_move = false;
 	}
-	cv.notify_all();
+	m_cv.notify_all();
 	return true;
 }

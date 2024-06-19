@@ -13,7 +13,7 @@
 
 void GameLoop() {
 	sf::RenderWindow window(sf::VideoMode(1200, 800), "Chess");
-	sf::Vector2u size = window.getSize();
+	sf::Vector2u m_size = window.getSize();
 	sf::Text whites;
 	sf::Text blacks;
 	sf::Text draws;
@@ -26,24 +26,24 @@ void GameLoop() {
 	bool round = true;
 	std::shared_ptr<HumanPlayer> human = std::make_shared<HumanPlayer>();
 	std::shared_ptr<ComputerPlayer> computer = std::make_shared<ComputerPlayer>();
-	std::unique_ptr<BoardView> board = std::make_unique<BoardView>(sf::Vector2f(0, 0), std::min(size.y * 1.f, size.x * 2.f / 3), human, computer, true);
-	float board_x_offset = board->getPosition().x + board->getSize();
+	std::unique_ptr<BoardView> m_board = std::make_unique<BoardView>(sf::Vector2f(0, 0), std::min(m_size.y * 1.f, m_size.x * 2.f / 3), human, computer, true);
+	float board_x_offset = m_board->GetPosition().x + m_board->GetSize();
 	Button nextGameButton(font);
-	nextGameButton.setSize(sf::Vector2f{ 250,50 });
+	nextGameButton.SetSize(sf::Vector2f{ 250,50 });
 	nextGameButton.setString("Start next game");
-	nextGameButton.setPosition(sf::Vector2f{ board_x_offset + 100, 300 });
+	nextGameButton.SetPosition(sf::Vector2f{ board_x_offset + 100, 300 });
 	Button humanVsComputerButton(font);
-	humanVsComputerButton.setSize(sf::Vector2f{ 250,50 });
+	humanVsComputerButton.SetSize(sf::Vector2f{ 250,50 });
 	humanVsComputerButton.setString("Human vs Computer");
-	humanVsComputerButton.setPosition(sf::Vector2f{ board_x_offset + 100, 360 });
+	humanVsComputerButton.SetPosition(sf::Vector2f{ board_x_offset + 100, 360 });
 	Button humanVsHumanButton(font);
-	humanVsHumanButton.setSize(sf::Vector2f{ 250,50 });
+	humanVsHumanButton.SetSize(sf::Vector2f{ 250,50 });
 	humanVsHumanButton.setString("Human vs Human");
-	humanVsHumanButton.setPosition(sf::Vector2f{ board_x_offset + 100, 420 });
+	humanVsHumanButton.SetPosition(sf::Vector2f{ board_x_offset + 100, 420 });
 	Button computerVsComputerButton(font);
-	computerVsComputerButton.setSize(sf::Vector2f{ 250,50 });
+	computerVsComputerButton.SetSize(sf::Vector2f{ 250,50 });
 	computerVsComputerButton.setString("Computer vs Computer");
-	computerVsComputerButton.setPosition(sf::Vector2f{ board_x_offset + 100, 480 });
+	computerVsComputerButton.SetPosition(sf::Vector2f{ board_x_offset + 100, 480 });
 	font.loadFromFile("Assets/Roboto-Regular.ttf");
 	window.setFramerateLimit(30);
 	whites.setPosition(sf::Vector2f{ board_x_offset + 100, 150 });
@@ -67,8 +67,8 @@ void GameLoop() {
 	blackPlayerNote.setFont(font);
 	blackPlayerNote.setString("Player2");
 	bool update = true, humanBlockerMoveRendered = false;
-	std::thread gameThread(&IGame::StartGame, board->game.get());
-	while (!board->game->isGameOn) {
+	std::thread gameThread(&IGame::StartGame, m_board->game.get());
+	while (!m_board->game->is_game_on) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(33));
 	}
 	while (window.isOpen()) {
@@ -81,66 +81,66 @@ void GameLoop() {
 				window.close();
 				break;
 			case sf::Event::MouseMoved:
-				board->HandleMouseMove(e.mouseMove, window);
+				m_board->HandleMouseMove(e.mouseMove, window);
 				break;
 			case sf::Event::MouseButtonPressed:
-				board->HandleMousePress(e.mouseButton, window);
+				m_board->HandleMousePress(e.mouseButton, window);
 				humanVsComputerButton.HandleMousePress(e.mouseButton, window);
 				humanVsHumanButton.HandleMousePress(e.mouseButton, window);
 				computerVsComputerButton.HandleMousePress(e.mouseButton, window);
 				nextGameButton.HandleMousePress(e.mouseButton, window);
 				break;
 			case sf::Event::MouseButtonReleased:
-				board->HandleMouseRealease(e.mouseButton, window);
+				m_board->HandleMouseRealease(e.mouseButton, window);
 				humanVsComputerButton.HandleMouseRealease(e.mouseButton, window);
 				humanVsHumanButton.HandleMouseRealease(e.mouseButton, window);
 				computerVsComputerButton.HandleMouseRealease(e.mouseButton, window);
 				nextGameButton.HandleMouseRealease(e.mouseButton, window);
 				if (humanVsComputerButton.Click()) {
-					board->game->isGameOn = false;
+					m_board->game->is_game_on = false;
 					human->TryMove();
 					human->TryMoveBlocker();
 					if (gameThread.joinable())
 						gameThread.join();
-					board = std::make_unique<BoardView>(board->getPosition(), board->getSize(), human, computer, true);
-					gameThread = std::thread(&IGame::StartGame, board->game.get());
+					m_board = std::make_unique<BoardView>(m_board->GetPosition(), m_board->GetSize(), human, computer, true);
+					gameThread = std::thread(&IGame::StartGame, m_board->game.get());
 				}
 				else if (humanVsHumanButton.Click()) {
-					board->game->isGameOn = false;
+					m_board->game->is_game_on = false;
 					human->TryMove();
 					human->TryMoveBlocker();
 					if (gameThread.joinable())
 						gameThread.join();
-					board = std::make_unique<BoardView>(board->getPosition(), board->getSize(), human, human, true);
-					gameThread = std::thread(&IGame::StartGame, board->game.get());
+					m_board = std::make_unique<BoardView>(m_board->GetPosition(), m_board->GetSize(), human, human, true);
+					gameThread = std::thread(&IGame::StartGame, m_board->game.get());
 				}
 				else if (computerVsComputerButton.Click()) {
-					board->game->isGameOn = false;
+					m_board->game->is_game_on = false;
 					human->TryMove();
 					human->TryMoveBlocker();
 					if (gameThread.joinable())
 						gameThread.join();
-					board = std::make_unique<BoardView>(board->getPosition(), board->getSize(), computer, computer, true);
-					gameThread = std::thread(&IGame::StartGame, board->game.get());
+					m_board = std::make_unique<BoardView>(m_board->GetPosition(), m_board->GetSize(), computer, computer, true);
+					gameThread = std::thread(&IGame::StartGame, m_board->game.get());
 				}
 				else if (nextGameButton.Click()) {
-					board->game->isGameOn = false;
+					m_board->game->is_game_on = false;
 					human->TryMove();
 					human->TryMoveBlocker();
 					if (gameThread.joinable())
 						gameThread.join();
-					auto rs = board->game->rs.winner;
-					gameThread = std::thread(&IGame::RestartGame, board->game.get());
-					while (!board->game->isGameOn) {
+					auto rs = m_board->game->rs.winner;
+					gameThread = std::thread(&IGame::RestartGame, m_board->game.get());
+					while (!m_board->game->is_game_on) {
 						std::this_thread::sleep_for(std::chrono::milliseconds(33));
 					}
 					if (round) {
-						whitePlayerNote.setPosition(sf::Vector2f{ size.x * 2.f / 3 + 20, 50 });
-						blackPlayerNote.setPosition(sf::Vector2f{ size.x * 2.f / 3 + 20, 700 });
+						whitePlayerNote.setPosition(sf::Vector2f{ m_size.x * 2.f / 3 + 20, 50 });
+						blackPlayerNote.setPosition(sf::Vector2f{ m_size.x * 2.f / 3 + 20, 700 });
 					}
 					else {
-						whitePlayerNote.setPosition(sf::Vector2f{ size.x * 2.f / 3 + 20, 700 });
-						blackPlayerNote.setPosition(sf::Vector2f{ size.x * 2.f / 3 + 20, 50 });
+						whitePlayerNote.setPosition(sf::Vector2f{ m_size.x * 2.f / 3 + 20, 700 });
+						blackPlayerNote.setPosition(sf::Vector2f{ m_size.x * 2.f / 3 + 20, 50 });
 					}
 					round = !round;
 					whites.setString(whiteWinsString);
@@ -156,8 +156,8 @@ void GameLoop() {
 				break;
 			}
 		}
-		if (!update && !board->game->stateChanged) {
-			if (human->blockerMove) {
+		if (!update && !m_board->game->state_changed) {
+			if (human->blocker_move) {
 				if (humanBlockerMoveRendered) {
 					std::this_thread::sleep_for(std::chrono::milliseconds(33));
 					continue;
@@ -171,10 +171,10 @@ void GameLoop() {
 			}
 
 		}
-		board->Update();
+		m_board->Update();
 		window.clear();
 		//re-render
-		window.draw(*board.get());
+		window.draw(*m_board.get());
 		window.draw(draws);
 		window.draw(whites);
 		window.draw(blacks);
@@ -187,12 +187,12 @@ void GameLoop() {
 		//end re-render
 		window.display();
 		update = false;
-		if (!board->game->isGameOn) {
+		if (!m_board->game->is_game_on) {
 			if (gameThread.joinable()) {
 				gameThread.join();
-				whiteWinsString = whiteWinsString.substr(0, 14) + std::to_string(board->game->player1);
-				blackWinsString = blackWinsString.substr(0, 14) + std::to_string(board->game->player2);
-				drawsString = drawsString.substr(0, 6) + std::to_string(board->game->draw);
+				whiteWinsString = whiteWinsString.substr(0, 14) + std::to_string(m_board->game->player1_score);
+				blackWinsString = blackWinsString.substr(0, 14) + std::to_string(m_board->game->player2_score);
+				drawsString = drawsString.substr(0, 6) + std::to_string(m_board->game->draw_score);
 				round = !round;
 				whites.setString(whiteWinsString);
 				blacks.setString(blackWinsString);
@@ -201,15 +201,11 @@ void GameLoop() {
 			}
 		}
 	}
-	board->game->isGameOn = false;
+	m_board->game->is_game_on = false;
 	human->TryMove();
 	human->TryMoveBlocker();
 	if (gameThread.joinable()) {
 		gameThread.join();
-		whiteWinsString = whiteWinsString.substr(0, 14) + std::to_string(board->game->player1);
-		blackWinsString = blackWinsString.substr(0, 14) + std::to_string(board->game->player2);
-		drawsString = drawsString.substr(0, 6) + std::to_string(board->game->draw);
-		update = true;
 	}
 
 }

@@ -11,12 +11,12 @@
 using Zobrist = uint64_t;
 class ZobristKey
 {
-	static std::once_flag initFlag;
+	static std::once_flag m_init_flag;
 	static void InitOnce();
 public:
 	static void Init();
 	static std::array<std::array<Zobrist, 64>, 12> hashes;
-	static Zobrist blackToMove;
+	static Zobrist black_to_move;
 
 	static Zobrist Compute(std::array<Bitboard, 12> bitboards, bool isBlacksTurn);
 	static Zobrist GetMove(Zobrist old, Square from, Square to, Piece piece, bool changeMover = true);

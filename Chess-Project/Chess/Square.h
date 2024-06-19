@@ -12,15 +12,15 @@ inline Rank GetRank(Square square) noexcept {
 	return square / 8;
 }
 
-inline bool isValidSquare(Square square) noexcept {
+inline bool IsValidSquare(Square square) noexcept {
 	return square < 64 && square >= 0;
 }
 
-inline bool isValidSquare(File file, Rank rank) noexcept {
+inline bool IsValidSquare(File file, Rank rank) noexcept {
 	return (file < 8 && rank < 8);
 }
 
-inline Square getSquare(File file, Rank rank) noexcept {
+inline Square GetSquare(File file, Rank rank) noexcept {
 	return rank * 8 + file;
 }
 
@@ -43,15 +43,15 @@ struct Coords {
 		return Coords{ static_cast<int8_t>(file * other), static_cast<int8_t>(rank * other) };
 	}
 
-	Square toSquareIndex() const noexcept {
+	Square ToSquareIndex() const noexcept {
 		return rank * 8 + file;
 	}
 
-	static Coords fromSquareIndex(Square square) {
+	static Coords FromSquareIndex(Square square) {
 		return Coords{ static_cast<int8_t>(GetFile(square)), static_cast<int8_t>(GetRank(square)) };
 	}
 
-	bool inline isValid() const noexcept {
+	bool inline IsValid() const noexcept {
 		return (file < 8 && rank < 8 && file >= 0 && rank >= 0);
 	}
 };
