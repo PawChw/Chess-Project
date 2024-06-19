@@ -6,10 +6,8 @@
 void Board::MakeMove(Move move)
 {
     // Check if the move is legal
-    if (legalMovesCache.empty()) GetLegalMoves();
-    if (!isMoveInVector(legalMovesCache, move)) {
-        int i = 0;
-        isMoveInVector(legalMovesCache, move);
+    if (m_legal_moves_cache.empty()) GetLegalMoves();
+    if (!IsMoveInVector(m_legal_moves_cache, move)) {
         throw std::invalid_argument("Illegal move");
     }
 
@@ -18,131 +16,131 @@ void Board::MakeMove(Move move)
 
 void Board::MoveBlocker(Square newBlockerSquare)
 {
-    if (!isValidSquare(newBlockerSquare)  || blockerSquare == newBlockerSquare) throw std::invalid_argument("Illegal blocker move");
-    Bitboard bb = getAllPiecesBitboard();
-    if(BitboardHelpers::getBit(bb, newBlockerSquare)) throw std::invalid_argument("Illegal blocker move");
-    blockerSquare = newBlockerSquare;
-    legalMovesCache.clear();
+    if (!IsValidSquare(newBlockerSquare)  || blocker_square == newBlockerSquare) throw std::invalid_argument("Illegal blocker move");
+    Bitboard bb = GetAllPiecesBitboard();
+    if(BitboardHelpers::GetBit(bb, newBlockerSquare)) throw std::invalid_argument("Illegal blocker move");
+    blocker_square = newBlockerSquare;
+    m_legal_moves_cache.clear();
 }
 
 void Board::ForceMakeMove(Move move)
 {
     // Move the piece and promote if promotion
-    board[move.to] = changePieceTypeIfNotNone(board[move.from], move.promotedToPieceType);
-    board[move.from] = None;
+    m_board[move.to] = ChangePieceTypeIfNotNone(m_board[move.from], move.promoted_to_piece_type);
+    m_board[move.from] = None;
 
     // Handle en passant capture
-    if (move.epSquare == move.to && PieceUtils::getPieceType(move.movedPiece) == Pawn) {
-        board[getSquare(GetFile(move.to), GetRank(move.from))] = None;
+    if (move.ep_square == move.to && PieceUtils::GetPieceType(move.moved_piece) == Pawn) {
+        m_board[GetSquare(GetFile(move.to), GetRank(move.from))] = None;
     }
     // handle castling
-    else if (move.isCastle.get(0)) {
+    else if (move.is_castle.Get(0)) {
         int rookFrom = move.from + 3;
         int rookTo = move.from + 1;
-        board[rookTo] = board[rookFrom];
-        board[rookFrom] = None;
+        m_board[rookTo] = m_board[rookFrom];
+        m_board[rookFrom] = None;
     }
-    else if (move.isCastle.get(1)) {
+    else if (move.is_castle.Get(1)) {
         int rookFrom = move.from - 4;
         int rookTo = move.from - 1;
-        board[rookTo] = board[rookFrom];
-        board[rookFrom] = None;
+        m_board[rookTo] = m_board[rookFrom];
+        m_board[rookFrom] = None;
     }
 
     // Update the en passant square
-    epSquare = -1;
-    if (getPieceType(move.movedPiece) == Pawn) {
+    ep_square = -1;
+    if (GetPieceType(move.moved_piece) == Pawn) {
         int diff = move.to - move.from;
         if (diff == 16 || diff == -16) {
-            epSquare = move.from + (diff / 2);
+            ep_square = move.from + (diff / 2);
         }
     }
     // update king squares
-    else if (getPieceType(move.movedPiece) == King) {
-        if (getColor(move.movedPiece) == White) whiteKing = move.to;
-        else blackKing = move.to;
+    else if (GetPieceType(move.moved_piece) == King) {
+        if (GetColor(move.moved_piece) == White) white_king = move.to;
+        else black_king = move.to;
     }
 
     //handle halfmoveclock
-    if (getPieceType(move.movedPiece) == Pawn || move.capturedPiece != None) {
-        historicHalfMoves.push_back(halfMoveClock);
-        halfMoveClock = 0;
+    if (GetPieceType(move.moved_piece) == Pawn || move.captured_piece != None) {
+        m_historic_half_moves.push_back(m_half_move_clock);
+        m_half_move_clock = 0;
     }
     else {
-        halfMoveClock++;
+        m_half_move_clock++;
     }
 
     //handle castle rights
-    if (move.castleRightsLost.get(0, 0)) castleRights[0][0] = false;
-    if (move.castleRightsLost.get(0, 1)) castleRights[0][1] = false;
-    if (move.castleRightsLost.get(1, 0)) castleRights[1][0] = false;
-    if (move.castleRightsLost.get(1, 1)) castleRights[1][1] = false;
+    if (move.castle_rights_lost.Get(0, 0)) castle_rights[0][0] = false;
+    if (move.castle_rights_lost.Get(0, 1)) castle_rights[0][1] = false;
+    if (move.castle_rights_lost.Get(1, 0)) castle_rights[1][0] = false;
+    if (move.castle_rights_lost.Get(1, 1)) castle_rights[1][1] = false;
 
 
-    gameMoveHistory.push_back(move);
-    gameHistory.push_back(currHash);
-    if (getColor(move.movedPiece) == Black) fullMoveClock++;
-    legalMovesCache.clear();
-    ZobristKey::Move(currHash, move.from, move.to, move.movedPiece);
-    isWhiteToMove = !isWhiteToMove;
+    m_game_move_history.push_back(move);
+    m_game_history.push_back(m_curr_hash);
+    if (GetColor(move.moved_piece) == Black) m_full_move_clock++;
+    m_legal_moves_cache.clear();
+    ZobristKey::Move(m_curr_hash, move.from, move.to, move.moved_piece);
+    is_white_to_move = !is_white_to_move;
     ply_count++;
 }
 
 void Board::UndoMove() {
-    if (gameMoveHistory.size() == 0) return;
-    Move& move = gameMoveHistory.back();
-    board[move.from] = move.movedPiece;
-    if (move.to == move.epSquare && PieceUtils::getPieceType(move.movedPiece) == Pawn) {
-        board[getSquare(GetFile(move.to), GetRank(move.from))] = move.capturedPiece;
-        board[move.to] = None;
+    if (m_game_move_history.size() == 0) return;
+    Move& move = m_game_move_history.back();
+    m_board[move.from] = move.moved_piece;
+    if (move.to == move.ep_square && PieceUtils::GetPieceType(move.moved_piece) == Pawn) {
+        m_board[GetSquare(GetFile(move.to), GetRank(move.from))] = move.captured_piece;
+        m_board[move.to] = None;
     }
     else
-        board[move.to] = move.capturedPiece;
-    if (move.isCastle.get(0)) {
+        m_board[move.to] = move.captured_piece;
+    if (move.is_castle.Get(0)) {
         int rookTo = move.from + 3;
         int rookFrom = move.from + 1;
-        board[rookTo] = board[rookFrom];
-        board[rookFrom] = None;
-    }else if(move.isCastle.get(1)) {
+        m_board[rookTo] = m_board[rookFrom];
+        m_board[rookFrom] = None;
+    }else if(move.is_castle.Get(1)) {
         int rookTo = move.from - 4;
         int rookFrom = move.from - 1;
-        board[rookTo] = board[rookFrom];
-        board[rookFrom] = None;
+        m_board[rookTo] = m_board[rookFrom];
+        m_board[rookFrom] = None;
     }
 
     //handle castle rights
-    if (move.castleRightsLost.get(0,0)) castleRights[0][0] = true;
-    if (move.castleRightsLost.get(0,1)) castleRights[0][1] = true;
-    if (move.castleRightsLost.get(1,0)) castleRights[1][0] = true;
-    if (move.castleRightsLost.get(1,1)) castleRights[1][1] = true;
+    if (move.castle_rights_lost.Get(0,0)) castle_rights[0][0] = true;
+    if (move.castle_rights_lost.Get(0,1)) castle_rights[0][1] = true;
+    if (move.castle_rights_lost.Get(1,0)) castle_rights[1][0] = true;
+    if (move.castle_rights_lost.Get(1,1)) castle_rights[1][1] = true;
 
     //return epSqure
-    epSquare = move.epSquare;
+    ep_square = move.ep_square;
 
     //return king squares
-    if (getPieceType(move.movedPiece) == King) {
-        if (getColor(move.movedPiece) == White) whiteKing = move.from;
-        else blackKing = move.from;
+    if (GetPieceType(move.moved_piece) == King) {
+        if (GetColor(move.moved_piece) == White) white_king = move.from;
+        else black_king = move.from;
     }
 
-    if (halfMoveClock == 0) {
-        halfMoveClock = historicHalfMoves.back();
-        historicHalfMoves.pop_back();
+    if (m_half_move_clock == 0) {
+        m_half_move_clock = m_historic_half_moves.back();
+        m_historic_half_moves.pop_back();
     }
     else {
-        halfMoveClock--;
+        m_half_move_clock--;
     }
-    gameMoveHistory.pop_back();
-    if (gameHistory.empty()) {
-        ZobristKey::Move(currHash, move.from, move.to, move.movedPiece);
+    m_game_move_history.pop_back();
+    if (m_game_history.empty()) {
+        ZobristKey::Move(m_curr_hash, move.from, move.to, move.moved_piece);
     }
     else {
-        currHash = gameHistory.back();
-        gameHistory.pop_back();
+        m_curr_hash = m_game_history.back();
+        m_game_history.pop_back();
     }
-    if (getColor(move.movedPiece) == Black) fullMoveClock--;
-    legalMovesCache.clear();
-    isWhiteToMove = !isWhiteToMove;
+    if (GetColor(move.moved_piece) == Black) m_full_move_clock--;
+    m_legal_moves_cache.clear();
+    is_white_to_move = !is_white_to_move;
     ply_count--;
 
 }
@@ -152,33 +150,33 @@ void Board::ParseFEN(std::string FEN)
     int i = 0;
     auto ps = Parser(FEN);
     char val;
-    while (!ps.finished() && i < 64) {
-        val = ps.consume();
+    while (!ps.Finished() && i < 64) {
+        val = ps.Consume();
         switch (val) {
         case 'K': 
-            board[i] = White | King; whiteKing = i; i++; break;
+            m_board[i] = White | King; white_king = i; i++; break;
         case 'Q': 
-            board[i] = White | Queen; i++; break;
+            m_board[i] = White | Queen; i++; break;
         case 'R': 
-            board[i] = White | Rook; i++; break;
+            m_board[i] = White | Rook; i++; break;
         case 'B': 
-            board[i] = White | Bishop; i++; break;
+            m_board[i] = White | Bishop; i++; break;
         case 'N': 
-            board[i] = White | Knight; i++; break;
+            m_board[i] = White | Knight; i++; break;
         case 'P':
-            board[i] = White | Pawn; i++; break;
+            m_board[i] = White | Pawn; i++; break;
         case 'k': 
-            board[i] = Black | King; blackKing = i; i++; break;
+            m_board[i] = Black | King; black_king = i; i++; break;
         case 'q': 
-            board[i] = Black | Queen; i++; break;
+            m_board[i] = Black | Queen; i++; break;
         case 'r': 
-            board[i] = Black | Rook; i++; break;
+            m_board[i] = Black | Rook; i++; break;
         case 'b': 
-            board[i] = Black | Bishop; i++; break;
+            m_board[i] = Black | Bishop; i++; break;
         case 'n': 
-            board[i] = Black | Knight; i++; break;
+            m_board[i] = Black | Knight; i++; break;
         case 'p': 
-            board[i] = Black | Pawn; i++; break;
+            m_board[i] = Black | Pawn; i++; break;
         case '1':
         case '2':
         case '3':
@@ -192,60 +190,60 @@ void Board::ParseFEN(std::string FEN)
             if (i % 8 != 0) throw std::invalid_argument("Invalid FEN(board invalid)");
         }
     }
-    if (!ps.finished())
-        if (ps.consume() != ' ') throw std::invalid_argument("Invalid FEN(space required 0)");
-    if (!ps.finished()) {
-        val = ps.consume();
-        if (val == 'w') isWhiteToMove = true;
-        else if (val == 'b') isWhiteToMove = false;
+    if (!ps.Finished())
+        if (ps.Consume() != ' ') throw std::invalid_argument("Invalid FEN(space required 0)");
+    if (!ps.Finished()) {
+        val = ps.Consume();
+        if (val == 'w') is_white_to_move = true;
+        else if (val == 'b') is_white_to_move = false;
         else throw std::invalid_argument("Invalid FEN(who's to move)");
     }
-    if (!ps.finished())
-        if (ps.consume() != ' ') throw std::invalid_argument("Invalid FEN(space required 1)");
-    castleRights = { {{false, false},{false, false }} };
-    while (!ps.finished()) {
-        val = ps.consume();
-        if (val == 'K') castleRights[1][0] = true;
-        else if (val == 'Q') castleRights[1][1] = true;
-        else if (val == 'k') castleRights[0][0] = true;
-        else if (val == 'q') castleRights[0][1] = true;
+    if (!ps.Finished())
+        if (ps.Consume() != ' ') throw std::invalid_argument("Invalid FEN(space required 1)");
+    castle_rights = { {{false, false},{false, false }} };
+    while (!ps.Finished()) {
+        val = ps.Consume();
+        if (val == 'K') castle_rights[1][0] = true;
+        else if (val == 'Q') castle_rights[1][1] = true;
+        else if (val == 'k') castle_rights[0][0] = true;
+        else if (val == 'q') castle_rights[0][1] = true;
         else if (val == '-') {
-            ps.consume();
+            ps.Consume();
             break;
         }
         else if (val == ' ') break;
         else throw std::invalid_argument("Invalid FEN(error with castle rights)");
     }
-    while (!ps.finished()) {
-        val = ps.consume();
+    while (!ps.Finished()) {
+        val = ps.Consume();
         Square pEpSquare = 0;
         if (val >= 'a' && val <= 'h') pEpSquare += val - 'a';
         else if (val >= '1' && val <= '8') pEpSquare += (val - '1') * 8;
         else if (val == '-') {
-            epSquare = -1;
-            ps.consume();
+            ep_square = -1;
+            ps.Consume();
             break;
         }
         else if (val == ' ') {
             if (pEpSquare < 16 || pEpSquare > 47) throw std::invalid_argument("Invalid FEN(invalid enPassant square)");
-            epSquare = pEpSquare;
+            ep_square = pEpSquare;
             break;
         }
         else throw std::invalid_argument("Invalid FEN(error with enPassant)");
     }
-    while (!ps.finished()) {
-        val = ps.consume();
-        if (val >= '0' && val <= '9') halfMoveClock = halfMoveClock * 10 + (val - '0');
-        else if (val == '-') halfMoveClock = 0;
+    while (!ps.Finished()) {
+        val = ps.Consume();
+        if (val >= '0' && val <= '9') m_half_move_clock = m_half_move_clock * 10 + (val - '0');
+        else if (val == '-') m_half_move_clock = 0;
         else if (val == ' ') {
             break;
         }
         else throw std::invalid_argument("Invalid FEN(error with halfMoveClock)");
     }
-    while (!ps.finished()) {
-        val = ps.consume();
-        if (val >= '0' && val <= '9') fullMoveClock = fullMoveClock * 10 + (val - '0');
-        else if (val == '-') fullMoveClock = 0;
+    while (!ps.Finished()) {
+        val = ps.Consume();
+        if (val >= '0' && val <= '9') m_full_move_clock = m_full_move_clock * 10 + (val - '0');
+        else if (val == '-') m_full_move_clock = 0;
         else if (val == ' ') {
             break;
         }
@@ -256,12 +254,12 @@ void Board::ParseFEN(std::string FEN)
 Board::Board()
 {
     ParseFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-    legalMovesCache.clear();
+    m_legal_moves_cache.clear();
     ZobristKey::Init();
-    Bitboard wb = getWhiteBitboard(), bb = getBlackBitboard(),
-        p = getBitboard(Pawn), n = getBitboard(Knight), b = getBitboard(Bishop),
-        r = getBitboard(Rook), q = getBitboard(Queen), k = getBitboard(King);
-    currHash = ZobristKey::Compute({
+    Bitboard wb = GetWhiteBitboard(), bb = GetBlackBitboard(),
+        p = GetBitboard(Pawn), n = GetBitboard(Knight), b = GetBitboard(Bishop),
+        r = GetBitboard(Rook), q = GetBitboard(Queen), k = GetBitboard(King);
+    m_curr_hash = ZobristKey::Compute({
         wb & p,
         wb & n,
         wb & b,
@@ -274,18 +272,18 @@ Board::Board()
         bb & r,
         bb & q,
         bb & k,
-        }, !isWhiteToMove);
+        }, !is_white_to_move);
 }
 
-Board::Board(std::string toParse)
+Board::Board(std::string to_parse)
 {
-    ParseFEN(toParse);
-    legalMovesCache.clear();
+    ParseFEN(to_parse);
+    m_legal_moves_cache.clear();
     ZobristKey::Init();
-    Bitboard wb = getWhiteBitboard(), bb = getBlackBitboard(),
-        p = getBitboard(Pawn), n = getBitboard(Knight), b = getBitboard(Bishop),
-        r = getBitboard(Rook), q = getBitboard(Queen), k = getBitboard(King);
-    currHash = ZobristKey::Compute({
+    Bitboard wb = GetWhiteBitboard(), bb = GetBlackBitboard(),
+        p = GetBitboard(Pawn), n = GetBitboard(Knight), b = GetBitboard(Bishop),
+        r = GetBitboard(Rook), q = GetBitboard(Queen), k = GetBitboard(King);
+    m_curr_hash = ZobristKey::Compute({
         wb & p,
         wb & n,
         wb & b,
@@ -298,126 +296,112 @@ Board::Board(std::string toParse)
         bb & r,
         bb & q,
         bb & k,
-        }, !isWhiteToMove);
+        }, !is_white_to_move);
 }
 
 const std::vector<Move>& Board::GetLegalMoves()
 {
-    if (legalMovesCache.empty()) {
+    if (m_legal_moves_cache.empty()) {
         auto gen = Generator(*this);
-        legalMovesCache = gen.GenerateLegalMoves();
+        m_legal_moves_cache = gen.GenerateLegalMoves();
     }
-    return legalMovesCache;
+    return m_legal_moves_cache;
 }
 
-const std::vector<Move> Board::GetCaptures()
-{
-    if (legalMovesCache.empty()) {
-        auto gen = Generator(*this);
-        legalMovesCache = gen.GenerateLegalMoves();
-    }
-    std::vector<Move> legalCaptures;
-    for (Move mv : legalMovesCache) {
-        if (mv.capturedPiece)
-            legalCaptures.push_back(mv);
-    }
-    return legalCaptures;
-}
-
-Bitboard Board::getBitboard(PieceType pieceType) const
+Bitboard Board::GetBitboard(PieceType pieceType) const
 {
     Bitboard bitboard = 0;
 
     for (int i = 63; i >= 0; i--) {
         bitboard <<= 1;
-        if (getPieceType(board[i]) == pieceType)
+        if (GetPieceType(m_board[i]) == pieceType)
             bitboard |= 1;
     }
     return bitboard;
 }
 
-Bitboard Board::getBitboard(PieceType pieceType, Color color) const
+Bitboard Board::GetBitboard(PieceType pieceType, Color color) const
 {
     Bitboard bitboard = 0;
     Piece piece = pieceType | color;
     for (int i = 63; i >= 0; i--) {
         bitboard <<= 1;
-        if (board[i] == piece)
+        if (m_board[i] == piece)
             bitboard |= 1;
     }
     return bitboard;
 }
 
-Bitboard Board::getPieceAttacks(Piece piece, Square square) const
+Bitboard Board::GetPieceAttacks(Piece piece, Square square) const
 {
-    bool isWhite = (getColor(piece) == White);
-    return GetPieceMoves(getPieceType(piece), square, (isWhite ? blackKing : whiteKing), getAllPiecesBitboard(), isWhite, epSquare, true);
+    bool isWhite = (GetColor(piece) == White);
+    return GetPieceMoves(GetPieceType(piece), square, (isWhite ? black_king : white_king), GetAllPiecesBitboard(), isWhite, ep_square, true);
 }
 
-Bitboard Board::getWhiteBitboard() const
+Bitboard Board::GetWhiteBitboard() const
 {
     Bitboard bitboard = 0;
 
     for (int i = 63; i >= 0; i--) {
         bitboard <<= 1;
-        if (board[i] & White)
+        if (m_board[i] & White)
             bitboard |= 1;
     }
     return bitboard;
 }
 
-Bitboard Board::getBlackBitboard() const
+Bitboard Board::GetBlackBitboard() const
 {
     Bitboard bitboard = 0;
 
     for (int i = 63; i >= 0; i--) {
         bitboard <<= 1;
-        if (board[i] & Black)
+        if (m_board[i] & Black)
             bitboard |= 1;
     }
     return bitboard;
 }
 
-Bitboard Board::getAllPiecesBitboard() const
+Bitboard Board::GetAllPiecesBitboard() const
 {
     Bitboard bitboard = 0;
 
     for (int i = 63; i >= 0; i--) {
         bitboard <<= 1;
-        if(board[i])
+        if(m_board[i])
             bitboard |= 1;
     }
     return bitboard;
 }
 
-Piece Board::getPieceOnSquare(Square square) const
+Piece Board::GetPieceOnSquare(Square square) const
 {
-    if (square == blockerSquare) return Blocker;
-    if (isValidSquare(square)) return board[square];
+    if (square == blocker_square) return Blocker;
+    if (IsValidSquare(square)) return m_board[square];
     return None;
 }
 
-bool Board::isSquareAttacked(Square square, bool byWho) const
+bool Board::IsSquareAttacked(Square square, bool byWho) const
 {
-    Bitboard allPieces = getAllPiecesBitboard(), currCheckBtboard;
+    Bitboard allPieces = GetAllPiecesBitboard(), currCheckBtboard;
     for (int i = Pawn; i < King; i++) {
-        currCheckBtboard = getBitboard(static_cast<PieceType>(i), byWho ? White : Black);
-        Bitboard bb = GetPieceMoves(static_cast<PieceType>(i), square, 0, allPieces, !byWho, epSquare, true);
+        currCheckBtboard = GetBitboard(static_cast<PieceType>(i), byWho ? White : Black);
+        Bitboard bb = GetPieceMoves(static_cast<PieceType>(i), square, 0, allPieces, !byWho, ep_square, true);
         if (static_cast<bool>(bb & currCheckBtboard)) return true;
     }
     return false;
 }
 
-bool Board::isInsufficientMaterial()
+bool Board::IsInsufficientMaterial()
 {
-    if (static_cast<bool>(getBitboard(Pawn))) 
+    if (static_cast<bool>(GetBitboard(Pawn))) 
         return false;
-    auto wb = getWhiteBitboard();
-    auto bb = getBlackBitboard();
-    auto K = getBitboard(Knight);
-    auto KnB = K | getBitboard(Bishop);
-    BitboardHelpers::clearBit(wb, whiteKing);
-    BitboardHelpers::clearBit(bb, blackKing);
+    auto wb = GetWhiteBitboard();
+    auto bb = GetBlackBitboard();
+    auto K = GetBitboard(Knight);
+    auto KnB = K | GetBitboard(Bishop);
+    BitboardHelpers::ClearBit(wb, white_king);
+    BitboardHelpers::ClearBit(bb, black_king);
     auto wP = BitboardHelpers::GetNumOfBitsSet(wb);
     auto bP = BitboardHelpers::GetNumOfBitsSet(bb);
     bool whiteInsufficient = false;
@@ -427,67 +411,67 @@ bool Board::isInsufficientMaterial()
     return whiteInsufficient && blackInsufficient;
 }
 
-bool Board::is50MoveRule() const
+bool Board::Is50MoveRule() const
 {
-    return halfMoveClock == 100;
+    return m_half_move_clock == 100;
 }
 
-bool Board::isSteelMate()
+bool Board::IsSteelMate()
 {
-    if (isInCheck(isWhiteToMove)) return false;
-    Bitboard myBB = isWhiteToMove ? getWhiteBitboard() : getBlackBitboard(),
-        myPawns = getBitboard(Pawn, isWhiteToMove ? White : Black);
-    BitboardHelpers::clearBit(myBB, isWhiteToMove ? whiteKing : blackKing);
+    if (IsInCheck(is_white_to_move)) return false;
+    Bitboard myBB = is_white_to_move ? GetWhiteBitboard() : GetBlackBitboard(),
+        myPawns = GetBitboard(Pawn, is_white_to_move ? White : Black);
+    BitboardHelpers::ClearBit(myBB, is_white_to_move ? white_king : black_king);
     if ((myPawns ^ myBB) & 4359202964317896252ull) return false; //magic bitboard to prevent stuck in corner in blocker games
     return GetLegalMoves().size() == 0;
 }
 
-bool Board::isRepetition()
+bool Board::IsRepetition()
 {
     int count = 0;
-    for (int i = gameHistory.size() - halfMoveClock; i < gameHistory.size(); i++) {
-        if (gameHistory[i] == currHash) {
+    for (int i = m_game_history.size() - m_half_move_clock; i < m_game_history.size(); i++) {
+        if (m_game_history[i] == m_curr_hash) {
             count++;
         }
     }
     return count > 1;
 }
 
-bool Board::isDraw()
+bool Board::IsDraw()
 {
-    return is50MoveRule() || isSteelMate() || isRepetition() || isInsufficientMaterial();
+    return Is50MoveRule() || IsSteelMate() || IsRepetition() || IsInsufficientMaterial();
 }
 
-bool Board::isInCheck(bool whoIs) const
+bool Board::IsInCheck(bool whoIs) const
 {
-    Square interesetedIn = whoIs ? whiteKing : blackKing;
-    return isSquareAttacked(interesetedIn, !whoIs);
+    Square interesetedIn = whoIs ? white_king : black_king;
+    return IsSquareAttacked(interesetedIn, !whoIs);
 }
 
-bool Board::isCheckMate()
+bool Board::IsCheckMate()
 {
-    return isInCheck(isWhiteToMove) && GetLegalMoves().size() == 0;
+    return IsInCheck(is_white_to_move) && GetLegalMoves().size() == 0;
 }
 
-bool Board::isKingCapturd() const
+bool Board::IsKingCapturd() const
 {
-    if (blockerSquare == -1) return false;
-    return BitboardHelpers::GetNumOfBitsSet(getBitboard(King)) != 2;
+    if (blocker_square == -1) return false;
+    return BitboardHelpers::GetNumOfBitsSet(GetBitboard(King)) != 2;
 }
 
-bool Board::wasProomtion() const
+bool Board::WasProomtion() const
 {
-    return static_cast<bool>(gameMoveHistory.back().capturedPiece);
+    return static_cast<bool>(m_game_move_history.back().captured_piece);
 }
 
-Zobrist Board::getZobristKey() const
+Zobrist Board::GetZobristKey() const
 {
-    return currHash;
+    return m_curr_hash;
 }
 
 std::array<Piece, 64> Board::GetBoard() const
 {
     std::array<Piece, 64> r;
-    std::copy(std::begin(board), std::end(board), r.begin());
+    std::copy(std::begin(m_board), std::end(m_board), r.begin());
     return r;
 }

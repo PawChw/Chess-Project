@@ -16,12 +16,12 @@
 #include "MoveHelper.h"
 
 template <typename T, int S>
-bool compareArrays(const std::array<T, S>& arr1, const std::array<T, S>& arr2) {
+bool CompareArrays(const std::array<T, S>& arr1, const std::array<T, S>& arr2) {
 	return std::equal(arr1.begin(), arr1.end(), arr2.begin());
 }
 
 template <typename T, int S>
-bool compareArrays(const T* arr1, const T* arr2) {
+bool CompareArrays(const T* arr1, const T* arr2) {
 	return std::equal(arr1, arr1+S, arr2);
 }
 
@@ -29,63 +29,62 @@ bool compareArrays(const T* arr1, const T* arr2) {
 using namespace PieceUtils;
 class Board {
 private:
-	std::vector<Move> legalMovesCache;
-	std::vector<Move> gameMoveHistory;
-	std::vector<Zobrist> gameHistory;
-	Zobrist currHash = 0;
-	std::vector<unsigned int> historicHalfMoves;
-	unsigned int halfMoveClock = 0;
-	unsigned int fullMoveClock = 0;
-	Piece board[64] = {0};
+	std::vector<Move> m_legal_moves_cache;
+	std::vector<Move> m_game_move_history;
+	std::vector<Zobrist> m_game_history;
+	Zobrist m_curr_hash = 0;
+	std::vector<unsigned int> m_historic_half_moves;
+	unsigned int m_half_move_clock = 0;
+	unsigned int m_full_move_clock = 0;
+	Piece m_board[64] = {0};
 	void ParseFEN(std::string FEN);
 public:
 	Board();
-	Board(std::string toParse);
+	Board(std::string to_parse);
 	Board(const Board& other) = default;
-	bool isWhiteToMove = true;
+	bool is_white_to_move = true;
 	int ply_count = 0;
-	Square epSquare = -1,
-		whiteKing = 4,
-		blackKing = 60,
-		blockerSquare = -1;
-	std::array<std::array<bool, 2>, 2 > castleRights = { {{true, true}, {true, true}} }; // k, q, K, Q
+	Square ep_square = -1,
+		white_king = 4,
+		black_king = 60,
+		blocker_square = -1;
+	std::array<std::array<bool, 2>, 2 > castle_rights = { {{true, true}, {true, true}} }; // k, q, K, Q
 	const std::vector<Move>& GetLegalMoves();
-	const std::vector<Move> GetCaptures();
 	void MakeMove(Move move);
 	void MoveBlocker(Square newBlockerSquare);
 	void ForceMakeMove(Move move);
 	void UndoMove();
-	Bitboard getPieceAttacks(Piece piece, Square square) const;
-	Bitboard getBitboard(PieceType pieceType) const;
-	Bitboard getBitboard(PieceType pieceType, Color color) const;
-	Bitboard getWhiteBitboard() const;
-	Bitboard getBlackBitboard() const;
-	Bitboard getAllPiecesBitboard() const;
-	Piece getPieceOnSquare(Square square) const;
-	bool isSquareAttacked(Square square, bool byWho) const;
-	bool isInsufficientMaterial();
-	bool is50MoveRule() const;
-	bool isSteelMate();
-	bool isRepetition();
-	bool isDraw();
-	bool isInCheck(bool whoIs) const;
-	bool isCheckMate();
-	bool isKingCapturd() const;
-	bool wasProomtion() const;
-	Zobrist getZobristKey() const;
+	Bitboard GetPieceAttacks(Piece piece, Square square) const;
+	Bitboard GetBitboard(PieceType pieceType) const;
+	Bitboard GetBitboard(PieceType pieceType, Color color) const;
+	Bitboard GetWhiteBitboard() const;
+	Bitboard GetBlackBitboard() const;
+	Bitboard GetAllPiecesBitboard() const;
+	Piece GetPieceOnSquare(Square square) const;
+	bool IsSquareAttacked(Square square, bool byWho) const;
+	bool IsInsufficientMaterial();
+	bool Is50MoveRule() const;
+	bool IsSteelMate();
+	bool IsRepetition();
+	bool IsDraw();
+	bool IsInCheck(bool whoIs) const;
+	bool IsCheckMate();
+	bool IsKingCapturd() const;
+	bool WasProomtion() const;
+	Zobrist GetZobristKey() const;
 	std::array<Piece, 64> GetBoard() const;
 
 	bool operator==(const Board& other) {
 		auto rs = ply_count == other.ply_count;
-		rs &= compareArrays<Piece, 64>(board, other.board);
-		rs &= epSquare == other.epSquare;
-		rs &= compareArrays(castleRights.at(1), other.castleRights.at(1));
-		rs &= compareArrays(castleRights.at(0), other.castleRights.at(0));
-		rs &= blockerSquare == blockerSquare;
-		rs &= whiteKing == other.whiteKing;
-		rs &= blackKing == other.blackKing;
-		rs &= isWhiteToMove == other.isWhiteToMove;
-		rs &= halfMoveClock == other.halfMoveClock;
+		rs &= CompareArrays<Piece, 64>(m_board, other.m_board);
+		rs &= ep_square == other.ep_square;
+		rs &= CompareArrays(castle_rights.at(1), other.castle_rights.at(1));
+		rs &= CompareArrays(castle_rights.at(0), other.castle_rights.at(0));
+		rs &= blocker_square == blocker_square;
+		rs &= white_king == other.white_king;
+		rs &= black_king == other.black_king;
+		rs &= is_white_to_move == other.is_white_to_move;
+		rs &= m_half_move_clock == other.m_half_move_clock;
 		return rs;
 	}
 

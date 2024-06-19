@@ -1,18 +1,18 @@
 #include "Parser.h"
 
-char Parser::consume()
+char Parser::Consume()
 {
-    char nxt = toParse[indexer];
+    char nxt = to_parse[indexer];
     indexer++;
     return nxt;
 }
 
-char Parser::lookAhead(unsigned long long i)
+char Parser::LookAhead(unsigned long long i)
 {
-    return toParse[indexer + i];
+    return to_parse[indexer + i];
 }
 
-bool Parser::finished()
+bool Parser::Finished()
 {
-    return indexer == toParse.length();
+    return indexer == to_parse.length();
 }

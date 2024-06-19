@@ -12,7 +12,7 @@ enum class Winner : uint8_t {
 };
 
 enum class Reason : uint8_t {
-	Repetition = 0, InsufficientMaterial, SteelMate, FiftyMoveRule, Checkmate, IllegalMove, KingCaptured
+	Repetition = 0, InsufficientMaterial, SteelMate, FiftyMoveRule, checkmate, IllegalMove, KingCaptured
 };
 
 struct GameTerminalState {
@@ -24,15 +24,15 @@ struct GameTerminalState {
 class IGame {
 public:
 	Board bd;
-	std::atomic_bool isGameOn, stateChanged;
-	bool player1isWhite = true;
-	int player1 = 0, player2 = 0, draw = 0;
+	std::atomic_bool is_game_on, state_changed;
+	bool player1_is_white = true;
+	int player1_score = 0, player2_score = 0, draw_score = 0;
 	GameTerminalState rs = GameTerminalState();
 	IGame() : bd(Board()) {
 	}
 	IGame(Board bd) : bd(bd) {}
 	sf::SoundBuffer capture, castle, check, move;
-	sf::Sound audioPlayer;
+	sf::Sound audio_player;
 	virtual GameTerminalState StartGame() = 0;
 	virtual GameTerminalState RestartGame() = 0;
 	virtual ~IGame() = default;

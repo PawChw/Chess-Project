@@ -7,7 +7,7 @@
 #include "Piece.h"
 
 
-int cmpMoves(const Move& m1, const Move& m2); /* REQUIREMENT
+int CmpMoves(const Move& m1, const Move& m2); /* REQUIREMENT
 		Moves are in order!
 		movedPiece asc
 		from asc
@@ -19,7 +19,7 @@ int cmpMoves(const Move& m1, const Move& m2); /* REQUIREMENT
 		@ret - if m1 < m2
 */
 
-int findMove(std::vector<Move> moves, Move toFind);/* REQUIREMENT
+int FindMove(std::vector<Move> m_moves, Move toFind);/* REQUIREMENT
 		Moves are in order!
 		movedPiece asc
 		from asc
@@ -27,7 +27,7 @@ int findMove(std::vector<Move> moves, Move toFind);/* REQUIREMENT
 		promotedToPieceType asc(for pawns only)
 */
 
-bool isMoveInVector(std::vector<Move> moves, Move toFind);/* REQUIREMENT
+bool IsMoveInVector(std::vector<Move> m_moves, Move toFind);/* REQUIREMENT
 		Moves are in order!
 		movedPiece asc
 		from asc

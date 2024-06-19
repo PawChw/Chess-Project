@@ -19,19 +19,19 @@ namespace PieceUtils {
 	const static PieceType Blocker = 7;
 
 
-	Color inline getColor(Piece piece) noexcept {
+	Color inline GetColor(Piece piece) noexcept {
 		return (piece & 24);
 	}
-	PieceType inline getPieceType(Piece piece) noexcept {
+	PieceType inline GetPieceType(Piece piece) noexcept {
 		return (piece & 7);
 	}
 
-	Piece inline changePieceTypeIfNotNone(Piece piece, PieceType pieceType) {
+	Piece inline ChangePieceTypeIfNotNone(Piece piece, PieceType pieceType) {
 		if (!(pieceType & 7)) return piece;
 		return (piece & 24) | (pieceType & 7);
 	}
 
-	Piece inline changeColor(Piece piece) {
+	Piece inline ChangeColor(Piece piece) {
 		return piece ^ (White|Black);
 	}
 };
