@@ -38,7 +38,7 @@ private:
 	const std::array<int, King+1> piece_vals = { 0, 100, 325, 325, 500, 975, checkmate };
 	Zobrist curr=0;
     int mg_increment[7] = { 0,0,1,1,2,4,0 };
-    const Clock max_time;
+    const Clock desired_time;
     const int qseDepth;
 
     const int16_t* mg_pesto_table[7] = {
@@ -63,21 +63,13 @@ private:
 
     int16_t mg_table[(PieceUtils::King | PieceUtils::White) + 1][64];
     int16_t eg_table[(PieceUtils::King | PieceUtils::White) + 1][64];
-    //threading specific
-    std::mutex alpha_mutex, beta_mutex, ev_mutex, best_move_mutex;
-    std::map<Zobrist, std::recursive_mutex> evaluated_positions;
-    std::atomic_int move_index;
-    std::chrono::system_clock::time_point terminate_time;
-    int NegaMaxThreadMaster(Board& bd, int alpha, int beta, int depth);
-    void NegaMaxThread(Board bd, int& alpha, int& beta, int depth, const std::vector<Move>& m_legal_moves, Move& bestMove, TranspositionFlag& bestFlag, int& bestValue);
+
     int NegaMax(Board& bd, int alpha, int beta, int depth);
     int NegaScout(Board& bd, int alpha, int beta, int depth);
     int Quiesce(Board& bd, int alpha, int beta, int checks = 0);
     std::vector<Move> FilterSilentMoves(Board& bd, std::vector<Move> m_moves);
-    std::vector<Move> m_moves;
 
 public:
-    int number_of_threads = 4;
     const static int16_t mg_pawn_table[64];
     const static int16_t eg_pawn_table[64];
     const static int16_t mg_knight_table[64];
