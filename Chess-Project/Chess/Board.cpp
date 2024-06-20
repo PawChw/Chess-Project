@@ -26,25 +26,31 @@ void Board::MoveBlocker(Square newBlockerSquare)
 void Board::ForceMakeMove(Move move)
 {
     // Move the piece and promote if promotion
-    m_board[move.to] = ChangePieceTypeIfNotNone(m_board[move.from], move.promoted_to_piece_type);
-    m_board[move.from] = None;
+    BitboardHelpers::ClearBit(m_board[PieceToBitboardIndex(move.moved_piece)], move.from);
+    BitboardHelpers::SetBit(m_board[PieceToBitboardIndex(ChangePieceTypeIfNotNone(move.moved_piece, move.promoted_to_piece_type))], move.to);
 
     // Handle en passant capture
     if (move.ep_square == move.to && PieceUtils::GetPieceType(move.moved_piece) == Pawn) {
-        m_board[GetSquare(GetFile(move.to), GetRank(move.from))] = None;
+        BitboardHelpers::ClearBit(m_board[PieceToBitboardIndex(move.moved_piece^(White|Black))], GetSquare(GetFile(move.to), GetRank(move.from)));
+    }
+    // handle capture
+    else if (move.captured_piece) {
+        BitboardHelpers::ClearBit(m_board[PieceToBitboardIndex(move.captured_piece)], move.to);
     }
     // handle castling
     else if (move.is_castle.Get(0)) {
         int rookFrom = move.from + 3;
         int rookTo = move.from + 1;
-        m_board[rookTo] = m_board[rookFrom];
-        m_board[rookFrom] = None;
+        int bbIndex = PieceToBitboardIndex(GetColor(move.moved_piece) | Rook);
+        BitboardHelpers::ClearBit(m_board[bbIndex], rookFrom);
+        BitboardHelpers::SetBit(m_board[bbIndex], rookTo);
     }
     else if (move.is_castle.Get(1)) {
         int rookFrom = move.from - 4;
         int rookTo = move.from - 1;
-        m_board[rookTo] = m_board[rookFrom];
-        m_board[rookFrom] = None;
+        int bbIndex = PieceToBitboardIndex(GetColor(move.moved_piece) | Rook);
+        BitboardHelpers::ClearBit(m_board[bbIndex], rookFrom);
+        BitboardHelpers::SetBit(m_board[bbIndex], rookTo);
     }
 
     // Update the en passant square
@@ -89,23 +95,33 @@ void Board::ForceMakeMove(Move move)
 void Board::UndoMove() {
     if (m_game_move_history.size() == 0) return;
     Move& move = m_game_move_history.back();
-    m_board[move.from] = move.moved_piece;
-    if (move.to == move.ep_square && PieceUtils::GetPieceType(move.moved_piece) == Pawn) {
-        m_board[GetSquare(GetFile(move.to), GetRank(move.from))] = move.captured_piece;
-        m_board[move.to] = None;
+    m_game_move_history.pop_back();
+
+    BitboardHelpers::SetBit(m_board[PieceToBitboardIndex(move.moved_piece)], move.from);
+    BitboardHelpers::ClearBit(m_board[PieceToBitboardIndex(ChangePieceTypeIfNotNone(move.moved_piece, move.promoted_to_piece_type))], move.to);
+
+    // Handle en passant capture
+    if (move.ep_square == move.to && PieceUtils::GetPieceType(move.moved_piece) == Pawn) {
+        BitboardHelpers::SetBit(m_board[PieceToBitboardIndex(move.moved_piece ^ (White | Black))], GetSquare(GetFile(move.to), GetRank(move.from)));
     }
-    else
-        m_board[move.to] = move.captured_piece;
-    if (move.is_castle.Get(0)) {
-        int rookTo = move.from + 3;
-        int rookFrom = move.from + 1;
-        m_board[rookTo] = m_board[rookFrom];
-        m_board[rookFrom] = None;
-    }else if(move.is_castle.Get(1)) {
-        int rookTo = move.from - 4;
-        int rookFrom = move.from - 1;
-        m_board[rookTo] = m_board[rookFrom];
-        m_board[rookFrom] = None;
+    // handle capture
+    else if (move.captured_piece) {
+        BitboardHelpers::SetBit(m_board[PieceToBitboardIndex(move.captured_piece)], move.to);
+    }
+    // handle castling
+    else if (move.is_castle.Get(0)) {
+        int rookFrom = move.from + 3;
+        int rookTo = move.from + 1;
+        int bbIndex = PieceToBitboardIndex(GetColor(move.moved_piece) | Rook);
+        BitboardHelpers::SetBit(m_board[bbIndex], rookFrom);
+        BitboardHelpers::ClearBit(m_board[bbIndex], rookTo);
+    }
+    else if (move.is_castle.Get(1)) {
+        int rookFrom = move.from - 4;
+        int rookTo = move.from - 1;
+        int bbIndex = PieceToBitboardIndex(GetColor(move.moved_piece) | Rook);
+        BitboardHelpers::SetBit(m_board[bbIndex], rookFrom);
+        BitboardHelpers::ClearBit(m_board[bbIndex], rookTo);
     }
 
     //handle castle rights
@@ -130,7 +146,7 @@ void Board::UndoMove() {
     else {
         m_half_move_clock--;
     }
-    m_game_move_history.pop_back();
+
     if (m_game_history.empty()) {
         ZobristKey::Move(m_curr_hash, move.from, move.to, move.moved_piece);
     }
@@ -138,6 +154,7 @@ void Board::UndoMove() {
         m_curr_hash = m_game_history.back();
         m_game_history.pop_back();
     }
+
     if (GetColor(move.moved_piece) == Black) m_full_move_clock--;
     m_legal_moves_cache.clear();
     is_white_to_move = !is_white_to_move;
@@ -154,29 +171,29 @@ void Board::ParseFEN(std::string FEN)
         val = ps.Consume();
         switch (val) {
         case 'K': 
-            m_board[i] = White | King; white_king = i; i++; break;
+            BitboardHelpers::SetBit(m_board[11], i); white_king = i; i++; break;
         case 'Q': 
-            m_board[i] = White | Queen; i++; break;
+            BitboardHelpers::SetBit(m_board[10], i); i++; break;
         case 'R': 
-            m_board[i] = White | Rook; i++; break;
+            BitboardHelpers::SetBit(m_board[9], i); i++; break;
         case 'B': 
-            m_board[i] = White | Bishop; i++; break;
+            BitboardHelpers::SetBit(m_board[8], i); i++; break;
         case 'N': 
-            m_board[i] = White | Knight; i++; break;
+            BitboardHelpers::SetBit(m_board[7], i); i++; break;
         case 'P':
-            m_board[i] = White | Pawn; i++; break;
+            BitboardHelpers::SetBit(m_board[6], i); i++; break;
         case 'k': 
-            m_board[i] = Black | King; black_king = i; i++; break;
+            BitboardHelpers::SetBit(m_board[5], i); black_king = i; i++; break;
         case 'q': 
-            m_board[i] = Black | Queen; i++; break;
+            BitboardHelpers::SetBit(m_board[4], i); i++; break;
         case 'r': 
-            m_board[i] = Black | Rook; i++; break;
+            BitboardHelpers::SetBit(m_board[3], i); i++; break;
         case 'b': 
-            m_board[i] = Black | Bishop; i++; break;
+            BitboardHelpers::SetBit(m_board[2], i); i++; break;
         case 'n': 
-            m_board[i] = Black | Knight; i++; break;
+            BitboardHelpers::SetBit(m_board[1], i); i++; break;
         case 'p': 
-            m_board[i] = Black | Pawn; i++; break;
+            BitboardHelpers::SetBit(m_board[0], i); i++; break;
         case '1':
         case '2':
         case '3':
@@ -251,6 +268,11 @@ void Board::ParseFEN(std::string FEN)
     }
 }
 
+inline int Board::PieceToBitboardIndex(Piece piece)
+{
+    return (GetColor(piece) == White ? 6 : 0) + (GetPieceType(piece) - 1);
+}
+
 Board::Board()
 {
     ParseFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
@@ -310,26 +332,14 @@ const std::vector<Move>& Board::GetLegalMoves()
 
 Bitboard Board::GetBitboard(PieceType pieceType) const
 {
-    Bitboard bitboard = 0;
-
-    for (int i = 63; i >= 0; i--) {
-        bitboard <<= 1;
-        if (GetPieceType(m_board[i]) == pieceType)
-            bitboard |= 1;
-    }
-    return bitboard;
+    int bitboardIndex = pieceType - 1;
+    return m_board[bitboardIndex] | m_board[bitboardIndex+6];
 }
 
 Bitboard Board::GetBitboard(PieceType pieceType, Color color) const
 {
-    Bitboard bitboard = 0;
-    Piece piece = pieceType | color;
-    for (int i = 63; i >= 0; i--) {
-        bitboard <<= 1;
-        if (m_board[i] == piece)
-            bitboard |= 1;
-    }
-    return bitboard;
+    int bitboardIndex = (color == White ? 6 : 0) + (pieceType - 1);
+    return m_board[bitboardIndex];
 }
 
 Bitboard Board::GetPieceAttacks(Piece piece, Square square) const
@@ -342,10 +352,8 @@ Bitboard Board::GetWhiteBitboard() const
 {
     Bitboard bitboard = 0;
 
-    for (int i = 63; i >= 0; i--) {
-        bitboard <<= 1;
-        if (m_board[i] & White)
-            bitboard |= 1;
+    for (int i = 6; i < 12; i++) {
+        bitboard |= m_board[i];
     }
     return bitboard;
 }
@@ -354,10 +362,8 @@ Bitboard Board::GetBlackBitboard() const
 {
     Bitboard bitboard = 0;
 
-    for (int i = 63; i >= 0; i--) {
-        bitboard <<= 1;
-        if (m_board[i] & Black)
-            bitboard |= 1;
+    for (int i = 0; i < 6; i++) {
+        bitboard |= m_board[i];
     }
     return bitboard;
 }
@@ -366,10 +372,8 @@ Bitboard Board::GetAllPiecesBitboard() const
 {
     Bitboard bitboard = 0;
 
-    for (int i = 63; i >= 0; i--) {
-        bitboard <<= 1;
-        if(m_board[i])
-            bitboard |= 1;
+    for (auto& bb : m_board) {
+        bitboard |= bb;
     }
     return bitboard;
 }
@@ -377,7 +381,13 @@ Bitboard Board::GetAllPiecesBitboard() const
 Piece Board::GetPieceOnSquare(Square square) const
 {
     if (square == blocker_square) return Blocker;
-    if (IsValidSquare(square)) return m_board[square];
+    if (IsValidSquare(square)) {
+        for (int i = 0; i < 12; i++) {
+            if (BitboardHelpers::GetBit(m_board[i], square)) {
+                return (i > 5 ? White : Black) | ((i % 6) + 1);
+            }
+        }
+    }
     return None;
 }
 
@@ -471,7 +481,9 @@ Zobrist Board::GetZobristKey() const
 
 std::array<Piece, 64> Board::GetBoard() const
 {
-    std::array<Piece, 64> r;
-    std::copy(std::begin(m_board), std::end(m_board), r.begin());
+    std::array<Piece, 64> r = { 0 };
+    for (int i = 0; i < 64; i++) {
+        r[i] = GetPieceOnSquare(i);
+    }
     return r;
 }

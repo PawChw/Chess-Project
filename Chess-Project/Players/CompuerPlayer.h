@@ -96,7 +96,7 @@ public:
     const static int mg_king_table[64];
     const static int eg_king_table[64];
     int Eval(Board& bd) const;
-	ComputerPlayer(uint8_t maxDepth = 8, Clock maxTime = std::chrono::seconds(5), int qseDepth = 3);
+	ComputerPlayer(uint8_t maxDepth = 10, Clock maxTime = std::chrono::seconds(5), int qseDepth = 4);
 	Square ThinkBlocker(Board bd) override;
 	Move Think(Board bd) override;
 	~ComputerPlayer();

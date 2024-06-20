@@ -36,8 +36,9 @@ private:
 	std::vector<unsigned int> m_historic_half_moves;
 	unsigned int m_half_move_clock = 0;
 	unsigned int m_full_move_clock = 0;
-	Piece m_board[64] = {0};
+	Bitboard m_board[12] = {0};
 	void ParseFEN(std::string FEN);
+	static inline int PieceToBitboardIndex(Piece piece);
 public:
 	Board();
 	Board(std::string to_parse);
@@ -76,7 +77,7 @@ public:
 
 	bool operator==(const Board& other) {
 		auto rs = ply_count == other.ply_count;
-		rs &= CompareArrays<Piece, 64>(m_board, other.m_board);
+		rs &= CompareArrays<Bitboard, 12>(m_board, other.m_board);
 		rs &= ep_square == other.ep_square;
 		rs &= CompareArrays(castle_rights.at(1), other.castle_rights.at(1));
 		rs &= CompareArrays(castle_rights.at(0), other.castle_rights.at(0));

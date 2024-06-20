@@ -2,15 +2,15 @@
 #include<array>
 #include<vector>
 #include<stdexcept>
+#include <intrin.h>
 
 using Bitboard = uint64_t;
 
 class BitboardHelpers
 {
 public:
-    static inline bool GetBit(Bitboard& bb, unsigned int square) {
-        auto result = static_cast<bool>(bb & (1ull << square));
-        return result;
+    static inline bool GetBit(const Bitboard& bb, unsigned int square) {
+        return static_cast<bool>((bb>>square)&1);
     }
 
     static inline void SetBit(Bitboard& bb, unsigned int square) {
@@ -65,12 +65,7 @@ public:
     }
 
     static inline unsigned int GetNumOfBitsSet(Bitboard bb) {
-        unsigned int bits = 0;
-        for (int i = 0; i < 64; i++) {
-            if (GetBit(bb, i))
-                bits++;
-        }
-        return bits;
+        return __popcnt64(bb);
     }
 
 };
