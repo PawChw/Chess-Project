@@ -3,10 +3,10 @@
 #include <iostream>
 class Button : public sf::Drawable {
 private:
-	bool is_pressed = false;
-	bool is_checked = false;
-	sf::RectangleShape rect;
-	sf::Text text;
+	bool m_is_pressed = false;
+	bool m_is_checked = false;
+	sf::RectangleShape m_rect;
+	sf::Text m_text;
 	HandlerCheckReoults HandlerCheck(int x, int y, sf::RenderTarget& target) const;
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 public:
