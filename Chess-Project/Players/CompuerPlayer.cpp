@@ -139,7 +139,8 @@ Move ComputerPlayer::Think(Board bd)
 
 int ComputerPlayer::NegaMax(Board& bd, int alpha, int beta, int depth)
 {
-    if (bd.IsCheckMate() || bd.IsKingCapturd()) return -checkmate+bd.ply_count;
+    if (bd.IsCheckMate()) return -checkmate + bd.ply_count;
+    if (bd.IsKingCapturd()) return checkmate - bd.ply_count;
     if (bd.IsDraw()) {
         if (Eval(bd) < -2000) return 100;
         return -100;
@@ -207,7 +208,8 @@ int ComputerPlayer::NegaMax(Board& bd, int alpha, int beta, int depth)
 
 int ComputerPlayer::NegaScout(Board& bd, int alpha, int beta, int depth)
 {
-    if (bd.IsCheckMate() || bd.IsKingCapturd()) return -checkmate + bd.ply_count;
+    if (bd.IsCheckMate()) return -checkmate + bd.ply_count;
+    if (bd.IsKingCapturd()) return checkmate - bd.ply_count;
     if (bd.IsDraw()) {
         if (Eval(bd) < -1000) return 100;
         return -1000;
@@ -257,7 +259,8 @@ int ComputerPlayer::NegaScout(Board& bd, int alpha, int beta, int depth)
 
 int ComputerPlayer::Quiesce(Board& bd, int alpha, int beta, int checks)
 {
-    if (bd.IsCheckMate() || bd.IsKingCapturd()) return -checkmate + bd.ply_count;
+    if (bd.IsCheckMate()) return -checkmate + bd.ply_count;
+    if (bd.IsKingCapturd()) return checkmate - bd.ply_count;
     int standPat = Eval(bd);
     if (bd.IsDraw()) {
         if (standPat < -1000) return 100;
