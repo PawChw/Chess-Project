@@ -1,6 +1,24 @@
 #include "BlockerGame.h"
 
-BlockerGame::BlockerGame(std::shared_ptr<IBlockerPlayer> white, std::shared_ptr<IBlockerPlayer> black) : IGame(Board()), white(white),
+BlockerGame::BlockerGame(const BlockerGame& other)
+{
+	bd = other.bd;
+	is_game_on = other.is_game_on.load();
+	player1_is_white = other.player1_is_white;
+	player1_score = other.player1_score;
+	player2_score = other.player2_score;
+	draw_score = other.draw_score;
+	rs = other.rs;
+	capture = other.capture;
+	castle = other.castle;
+	check = other.check;
+	move = other.move;
+	audio_player = other.audio_player;
+	white = other.white;
+	black = other.black;
+}
+
+BlockerGame::BlockerGame(IBlockerPlayer* white, IBlockerPlayer* black) : IGame(Board()), white(white),
 black(black)
 {
 	is_game_on = false;
@@ -158,5 +176,11 @@ GameTerminalState BlockerGame::RestartGame()
 	player1_is_white = !player1_is_white;
 	bd = Board();
 	rs = GameTerminalState();
+	state_changed = true;
 	return StartGame();
+}
+
+std::unique_ptr<IGame> BlockerGame::Clone() const
+{
+	return std::make_unique<BlockerGame>(*this);
 }

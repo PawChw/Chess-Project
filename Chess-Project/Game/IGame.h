@@ -35,5 +35,6 @@ public:
 	sf::Sound audio_player;
 	virtual GameTerminalState StartGame() = 0;
 	virtual GameTerminalState RestartGame() = 0;
+	virtual std::unique_ptr<IGame> Clone() const = 0;
 	virtual ~IGame() = default;
 };

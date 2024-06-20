@@ -1,6 +1,24 @@
 #include "Game.h"
 
-Game::Game(std::shared_ptr<IPlayer> white, std::shared_ptr<IPlayer> black) : IGame(Board()), white(white),
+Game::Game(const Game& other)
+{
+	bd = other.bd;
+	is_game_on = other.is_game_on.load();
+	player1_is_white = other.player1_is_white;
+	player1_score = other.player1_score;
+	player2_score = other.player2_score;
+	draw_score = other.draw_score;
+	rs = other.rs;
+	capture = other.capture;
+	castle = other.castle;
+	check = other.check;
+	move = other.move;
+	audio_player = other.audio_player;
+	white = other.white;
+	black = other.black;
+}
+
+Game::Game(IPlayer* white, IPlayer* black) : IGame(Board()), white(white),
 	black(black)
 {
 	is_game_on = false;
@@ -109,5 +127,11 @@ GameTerminalState Game::RestartGame()
 	player1_is_white = !player1_is_white;
 	bd = Board();
 	rs = GameTerminalState();
+	state_changed = true;
 	return StartGame();
+}
+
+std::unique_ptr<IGame> Game::Clone() const
+{
+	return std::make_unique<Game>(*this);
 }

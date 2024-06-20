@@ -14,6 +14,8 @@ sf::Texture BoardView::black_queen;
 sf::Texture BoardView::white_king;
 sf::Texture BoardView::black_king;
 sf::Texture BoardView::duck;
+sf::Texture BoardView::promotion_texture;
+sf::Texture BoardView::board_texture;
 
 void BoardView::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
@@ -32,16 +34,14 @@ void BoardView::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	}
 }
 
-BoardView::BoardView(sf::Vector2f pos, float size, std::shared_ptr<IBlockerPlayer> white, std::shared_ptr<IBlockerPlayer> black, bool withBlockers) : m_size(size), m_pos(pos), white(white), black(black) {
+BoardView::BoardView(sf::Vector2f pos, float size, IBlockerPlayer* white, IBlockerPlayer* black, bool withBlockers) : m_size(size), m_pos(pos), white(white), black(black) {
 	LoadTextures();
 	m_board = sf::RectangleShape(sf::Vector2f{ size ,size });
 	m_promotion_bg = sf::RectangleShape(sf::Vector2f{ size ,size/4 });
-	m_board_texture.loadFromFile("Assets/board.png");
-	m_promotion_texture.loadFromFile("Assets/PromotionBg.png");
 	m_board.setPosition(pos);
-	m_board.setTexture(&m_board_texture);
+	m_board.setTexture(&board_texture);
 	m_promotion_bg.setPosition(pos);
-	m_promotion_bg.setTexture(&m_promotion_texture);
+	m_promotion_bg.setTexture(&promotion_texture);
 	m_size_or_position_changed = true;
 	m_promotions.fill(sf::RectangleShape(sf::Vector2f{ size / 4, size / 4 }));
 	if (withBlockers)
@@ -49,28 +49,27 @@ BoardView::BoardView(sf::Vector2f pos, float size, std::shared_ptr<IBlockerPlaye
 	else
 		game = std::make_unique<Game>(this->white, this->black);
 	Update();
-
 }
 
-void BoardView::Update()
+void BoardView::Update(bool forceMovesUpdate)
 {
 	float squareSize = m_size / 8.f;
 	sf::RectangleShape square(sf::Vector2f{ squareSize, squareSize });
 	float circleRadius = squareSize / 6;
 	float circleOffset = squareSize/2 - circleRadius;
 	sf::CircleShape circle(circleRadius);
-	if (game->state_changed || m_move_selection_changed || m_size_or_position_changed) {
+	if (game->state_changed || m_move_selection_changed || m_size_or_position_changed || forceMovesUpdate) {
 		if(!m_moves->empty())
 			m_moves->clear();
 		std::unordered_set<uint16_t> drawnMoves;
 		HumanPlayer* toMove = nullptr;
 		HumanPlayer* to_move_blocker = nullptr;
-		if (auto d = dynamic_cast<HumanPlayer*>(white.get()); d != nullptr)
+		if (auto d = dynamic_cast<HumanPlayer*>(white); d != nullptr)
 		{
 			if (d->move) toMove = d;
 			if (d->blocker_move) to_move_blocker = d;
 		}
-		if (auto d = dynamic_cast<HumanPlayer*>(black.get()); d != nullptr)
+		if (auto d = dynamic_cast<HumanPlayer*>(black); d != nullptr)
 		{
 			if (d->move) toMove = d;
 			if (d->blocker_move) to_move_blocker = d;
@@ -190,12 +189,12 @@ void BoardView::HandleMousePress(sf::Event::MouseButtonEvent& e, sf::RenderTarge
 	int squareSize = static_cast<int>(m_size / 8);
 	HumanPlayer* toMove = nullptr;
 	HumanPlayer* to_move_blocker = nullptr;
-	if (auto d = dynamic_cast<HumanPlayer*>(white.get()); d != nullptr)
+	if (auto d = dynamic_cast<HumanPlayer*>(white); d != nullptr)
 	{
 		if (d->move) toMove = d;
 		if (d->blocker_move) to_move_blocker = d;
 	}
-	if (auto d = dynamic_cast<HumanPlayer*>(black.get()); d != nullptr)
+	if (auto d = dynamic_cast<HumanPlayer*>(black); d != nullptr)
 	{
 		if (d->move) toMove = d;
 		if (d->blocker_move) to_move_blocker = d;
@@ -295,11 +294,52 @@ void BoardView::LoadTextures()
 
 	if (!duck.loadFromFile("Assets/Pieces/Chess.com/duck.png"))
 		throw std::invalid_argument("Duck texture missing");
+
+	if (!board_texture.loadFromFile("Assets/Board.png"))
+		throw std::invalid_argument("Board texture missing");
+	if (!promotion_texture.loadFromFile("Assets/PromotionBg.png"))
+		throw std::invalid_argument("Promotion texture missing");
+
 }
 
 BoardView::~BoardView()
 {
 
+}
+
+BoardView& BoardView::operator=(const BoardView& rhs)
+{
+	if (this == &rhs) {
+		return *this;
+	}
+
+	m_board = rhs.m_board;
+	m_promotion_bg = rhs.m_promotion_bg;
+	m_legal_moves = rhs.m_legal_moves;
+	m_promotions = rhs.m_promotions;
+	m_pos = rhs.m_pos;
+	m_move_selection_changed = true;
+	m_size_or_position_changed = true;
+	m_selected = rhs.m_selected;
+	m_size = rhs.m_size;
+	m_promotion_move = rhs.m_promotion_move;
+
+	m_pieces = std::make_unique<std::vector<sf::RectangleShape>>(*rhs.m_pieces);
+	m_moves = std::make_unique<std::vector<sf::CircleShape>>(*rhs.m_moves);
+
+	if (rhs.game) {
+		game = rhs.game->Clone();
+		game->state_changed = true;
+	}
+	else {
+		game.reset();
+	}
+
+	// Copy raw pointers
+	white = rhs.white;
+	black = rhs.black;
+
+	return *this;
 }
 
 void BoardView::SetPosition(sf::Vector2f m_pos)

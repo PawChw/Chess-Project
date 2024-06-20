@@ -5,12 +5,14 @@
 #include "IGame.h"
 #include "Player/IPlayer.h"
 
-class Game : public IGame {
+class Game final : public IGame {
 public:
-	std::shared_ptr<IPlayer> white;
-	std::shared_ptr<IPlayer> black;
+	IPlayer* white;
+	IPlayer* black;
 	Game() = delete;
-	Game(std::shared_ptr<IPlayer> white, std::shared_ptr<IPlayer> black);
+	Game(const Game& other);
+	Game(IPlayer* white, IPlayer* black);
 	GameTerminalState StartGame() override;
 	GameTerminalState RestartGame() override;
+	std::unique_ptr<IGame> Clone() const override;
 };

@@ -30,7 +30,7 @@ enum TranspositionSize : Zobrist {
     // keeping tt size as even number makes it easy to size limit thanks to bitwise or instead of division by size
 };
 
-class ComputerPlayer : public IBlockerPlayer {
+class ComputerPlayer final : public IBlockerPlayer {
 private:
 	static const Zobrist mask = GB1;
 	std::unique_ptr< std::array<MoveEval, mask + 1>> transposition = std::make_unique< std::array<MoveEval, mask + 1>>();
