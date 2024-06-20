@@ -19,8 +19,6 @@ struct MovesToDraw {
 class BoardView : public sf::Drawable {
 private:
 	sf::RectangleShape m_board, m_promotion_bg;
-	sf::Texture m_board_texture;
-	sf::Texture m_promotion_texture;
 	std::vector<MovesToDraw> m_legal_moves;
 	std::unique_ptr<std::vector<sf::RectangleShape>> m_pieces = std::make_unique<std::vector<sf::RectangleShape>>();
 	std::unique_ptr<std::vector<sf::CircleShape>> m_moves = std::make_unique<std::vector<sf::CircleShape>>();
@@ -50,13 +48,15 @@ public:
 	static sf::Texture white_king;
 	static sf::Texture black_king;
 	static sf::Texture duck;
+	static sf::Texture board_texture;
+	static sf::Texture promotion_texture;
 	std::unique_ptr<IGame> game;
-	std::shared_ptr<IBlockerPlayer> white;
-	std::shared_ptr<IBlockerPlayer> black;
+	IBlockerPlayer* white;
+	IBlockerPlayer* black;
 	BoardView() = delete;
 	BoardView(const BoardView&) = delete;
-	BoardView(sf::Vector2f pos, float size, std::shared_ptr<IBlockerPlayer> white, std::shared_ptr<IBlockerPlayer> black, bool withBlockers = true);
-	void Update();
+	BoardView(sf::Vector2f pos, float size, IBlockerPlayer* white, IBlockerPlayer* black, bool withBlockers = true);
+	void Update(bool forceMovesUpdate = false);
 	void SetPosition(sf::Vector2f m_pos);
 	sf::Vector2f GetPosition();
 	void SetSize(float m_size);
@@ -65,4 +65,5 @@ public:
 	void HandleMousePress(sf::Event::MouseButtonEvent& e, sf::RenderTarget& target);
 	void HandleMouseMove(sf::Event::MouseMoveEvent& e, sf::RenderTarget& target);
 	~BoardView();
+	BoardView& operator=(const BoardView& rhs);
 };

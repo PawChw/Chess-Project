@@ -30,7 +30,7 @@ enum TranspositionSize : Zobrist {
     // keeping tt size as even number makes it easy to size limit thanks to bitwise or instead of division by size
 };
 
-class ComputerPlayer : public IBlockerPlayer {
+class ComputerPlayer final : public IBlockerPlayer {
 private:
 	static const Zobrist mask = GB1;
 	std::unique_ptr< std::array<MoveEval, mask + 1>> transposition = std::make_unique< std::array<MoveEval, mask + 1>>();
@@ -96,7 +96,7 @@ public:
     const static int mg_king_table[64];
     const static int eg_king_table[64];
     int Eval(Board& bd) const;
-	ComputerPlayer(uint8_t maxDepth = 8, Clock maxTime = std::chrono::seconds(5), int qseDepth = 3);
+	ComputerPlayer(uint8_t maxDepth = 10, Clock maxTime = std::chrono::seconds(5), int qseDepth = 4);
 	Square ThinkBlocker(Board bd) override;
 	Move Think(Board bd) override;
 	~ComputerPlayer();

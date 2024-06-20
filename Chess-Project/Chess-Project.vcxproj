@@ -86,6 +86,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Chess\BitboardHelpers.cpp" />
     <ClCompile Include="Chess\Board.cpp" />
     <ClCompile Include="Chess\Generator.cpp" />
     <ClCompile Include="Chess\MoveGen.cpp" />

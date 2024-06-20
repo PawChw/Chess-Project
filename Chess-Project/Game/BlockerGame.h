@@ -3,12 +3,14 @@
 #include "../Chess.h"
 #include "Player/IBlockerPlayer.h"
 
-class BlockerGame : public IGame {
+class BlockerGame final : public IGame {
 public:
-	std::shared_ptr<IBlockerPlayer> white;
-	std::shared_ptr<IBlockerPlayer> black;
+	IBlockerPlayer* white;
+	IBlockerPlayer* black;
 	BlockerGame() = delete;
-	BlockerGame(std::shared_ptr<IBlockerPlayer> white, std::shared_ptr<IBlockerPlayer> black);
+	BlockerGame(const BlockerGame& other);
+	BlockerGame(IBlockerPlayer* white, IBlockerPlayer* black);
 	GameTerminalState StartGame() override;
 	GameTerminalState RestartGame() override;
+	std::unique_ptr<IGame> Clone() const override;
 };

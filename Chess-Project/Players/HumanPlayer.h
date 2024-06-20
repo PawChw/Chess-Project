@@ -9,7 +9,7 @@ enum class TryMoveResoult {
     INVALID = 0, VALID, PROMOTION
 };
 
-class HumanPlayer :
+class HumanPlayer final :
     public IBlockerPlayer
 {
 private:
