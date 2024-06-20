@@ -100,6 +100,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="UI\BoardView.cpp" />
     <ClCompile Include="UI\Button.cpp" />
+    <ClCompile Include="UI\Checkmark.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Board.png" />
@@ -171,6 +172,7 @@
     <ClInclude Include="UI\BoardView.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="UI\Button.h" />
+    <ClInclude Include="UI\Checkmark.h" />
     <ClInclude Include="UI\Common.h" />
   </ItemGroup>
   <ItemGroup>

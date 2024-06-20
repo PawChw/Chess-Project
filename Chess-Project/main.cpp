@@ -7,9 +7,9 @@
 #include "Chess.h"
 #include <string>
 #include <algorithm>
-#include <Windows.h>
 #include "Player.h"
 #include "UI/Button.h"
+#include "UI/Checkmark.h"
 
 int main() {
 	sf::RenderWindow window(sf::VideoMode(1200, 800), "Chess");
@@ -30,20 +30,25 @@ int main() {
 	float board_x_offset = board.GetPosition().x + board.GetSize();
 	Button nextGameButton(font);
 	nextGameButton.SetSize(sf::Vector2f{ 250,50 });
-	nextGameButton.setString("Start next game");
+	nextGameButton.SetString("Start next game");
 	nextGameButton.SetPosition(sf::Vector2f{ board_x_offset + 100, 300 });
 	Button humanVsComputerButton(font);
 	humanVsComputerButton.SetSize(sf::Vector2f{ 250,50 });
-	humanVsComputerButton.setString("Human vs Computer");
+	humanVsComputerButton.SetString("Human vs Computer");
 	humanVsComputerButton.SetPosition(sf::Vector2f{ board_x_offset + 100, 360 });
 	Button humanVsHumanButton(font);
 	humanVsHumanButton.SetSize(sf::Vector2f{ 250,50 });
-	humanVsHumanButton.setString("Human vs Human");
+	humanVsHumanButton.SetString("Human vs Human");
 	humanVsHumanButton.SetPosition(sf::Vector2f{ board_x_offset + 100, 420 });
 	Button computerVsComputerButton(font);
 	computerVsComputerButton.SetSize(sf::Vector2f{ 250,50 });
-	computerVsComputerButton.setString("Computer vs Computer");
+	computerVsComputerButton.SetString("Computer vs Computer");
 	computerVsComputerButton.SetPosition(sf::Vector2f{ board_x_offset + 100, 480 });
+	Checkmark withBlockers(font);
+	withBlockers.SetSize(sf::Vector2f{ 250,50 });
+	withBlockers.SetString("Game \\w blockeres");
+	withBlockers.SetPosition(sf::Vector2f{ board_x_offset + 100, 540 });
+	withBlockers.SetChecked(true);
 	font.loadFromFile("Assets/Roboto-Regular.ttf");
 	window.setFramerateLimit(30);
 	whites.setPosition(sf::Vector2f{ board_x_offset + 100, 150 });
@@ -89,6 +94,7 @@ int main() {
 				humanVsHumanButton.HandleMousePress(e.mouseButton, window);
 				computerVsComputerButton.HandleMousePress(e.mouseButton, window);
 				nextGameButton.HandleMousePress(e.mouseButton, window);
+				withBlockers.HandleMousePress(e.mouseButton, window);
 				break;
 			case sf::Event::MouseButtonReleased:
 				board.HandleMouseRealease(e.mouseButton, window);
@@ -96,13 +102,14 @@ int main() {
 				humanVsHumanButton.HandleMouseRealease(e.mouseButton, window);
 				computerVsComputerButton.HandleMouseRealease(e.mouseButton, window);
 				nextGameButton.HandleMouseRealease(e.mouseButton, window);
+				withBlockers.HandleMouseRealease(e.mouseButton, window);
 				if (humanVsComputerButton.Click()) {
 					board.game->is_game_on = false;
 					human.TryMove();
 					human.TryMoveBlocker();
 					if (gameThread.joinable())
 						gameThread.join();
-					board = BoardView(board.GetPosition(), board.GetSize(), &human, &computer, true);
+					board = BoardView(board.GetPosition(), board.GetSize(), &human, &computer, withBlockers.Checked());
 					gameThread = std::thread(&IGame::StartGame, board.game.get());
 				}
 				else if (humanVsHumanButton.Click()) {
@@ -111,7 +118,7 @@ int main() {
 					human.TryMoveBlocker();
 					if (gameThread.joinable())
 						gameThread.join();
-					board = BoardView(board.GetPosition(), board.GetSize(), &human, &human, true);
+					board = BoardView(board.GetPosition(), board.GetSize(), &human, &human, withBlockers.Checked());
 					gameThread = std::thread(&IGame::StartGame, board.game.get());
 				}
 				else if (computerVsComputerButton.Click()) {
@@ -120,7 +127,7 @@ int main() {
 					human.TryMoveBlocker();
 					if (gameThread.joinable())
 						gameThread.join();
-					board = BoardView(board.GetPosition(), board.GetSize(), &computer, &computer, true);
+					board = BoardView(board.GetPosition(), board.GetSize(), &computer, &computer, withBlockers.Checked());
 					gameThread = std::thread(&IGame::StartGame, board.game.get());
 				}
 				else if (nextGameButton.Click()) {
@@ -184,6 +191,7 @@ int main() {
 		window.draw(humanVsHumanButton);
 		window.draw(computerVsComputerButton);
 		window.draw(nextGameButton);
+		window.draw(withBlockers);
 		//end re-render
 		window.display();
 		update = false;
