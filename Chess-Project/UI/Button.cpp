@@ -27,9 +27,10 @@ Button::Button(sf::Font& font)
 void Button::HandleMouseRealease(sf::Event::MouseButtonEvent& e, sf::RenderTarget& target)
 {
 	auto check = HandlerCheck(e.x, e.y, target);
+	bool wasPressed = is_pressed;
 	is_pressed = false;
-	if (check.is_ok && e.button == sf::Mouse::Left) {
-		should_click = true;
+	if (wasPressed && check.is_ok && e.button == sf::Mouse::Left) {
+		is_checked = true;
 	}
 	rect.setFillColor(sf::Color(166, 166, 166));
 }
@@ -44,8 +45,8 @@ void Button::HandleMousePress(sf::Event::MouseButtonEvent& e, sf::RenderTarget& 
 
 bool Button::Click()
 {
-	if (should_click) {
-		should_click = false;
+	if (is_checked) {
+		is_checked = false;
 		return true;
 	}
 	return false;
@@ -69,7 +70,7 @@ void Button::SetSize(sf::Vector2f m_size)
 	text.setPosition(sf::Vector2f{ m_pos.x + m_size.x / 2 - stringSize / 2 , m_pos.y + m_size.y / 2 - charSize / 2 });
 }
 
-void Button::setString(const std::string& string)
+void Button::SetString(const std::string& string)
 {
 	this->text.setString(string);
 	auto rectBounds = rect.getLocalBounds();
