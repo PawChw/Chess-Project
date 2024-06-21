@@ -128,11 +128,15 @@ Move ComputerPlayer::Think(Board bd)
     int depth = 1;
     int mateMaxDepth = -checkmate - bd.ply_count - max_depth;
     auto sTime = std::chrono::system_clock::now();
+    auto& tt = transposition->at(mask & curr);
+    if (tt.depth > 1 && tt.hash == curr) {
+        depth = tt.depth;
+    }
     while (depth < max_depth && std::chrono::system_clock::now() - sTime < (desired_time/3)) {
+        std::cout << "Computer thinks at depth " << depth << std::endl;
         if (NegaMax(bd, mateMaxDepth, -mateMaxDepth, depth) > checkmate-bd.ply_count-max_depth) break;
         depth++;
     }
-    auto& tt = transposition->at(mask & curr);
     std::cout << "Computer thinks(m)" << (bd.is_white_to_move ? "(w): " : "(b): ") << static_cast<char>(GetFile(tt.move.to) + 'a') << static_cast<char>('8' - GetRank(tt.move.to)) << "\tvalue: " << static_cast<int>(tt.eval) << "\tat depth: " << static_cast<int>(tt.depth) << "\tin: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - sTime).count() << "ms" << std::endl;
     return tt.move;
 }
@@ -184,6 +188,7 @@ int ComputerPlayer::NegaMax(Board& bd, int alpha, int beta, int depth)
         if (value > alpha && value < beta)
             value = -NegaMax(bd, -beta, -alpha, depth - 1) + (move.is_castle.toBool() ? 500 : 0);
         bd.UndoMove();
+
         if (value >= beta) {
             bestVal = value;
             bestFlag = TranspositionFlag::UPPERBOUND;

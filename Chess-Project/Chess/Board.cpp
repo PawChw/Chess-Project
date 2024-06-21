@@ -25,6 +25,7 @@ void Board::MoveBlocker(Square newBlockerSquare)
 
 void Board::ForceMakeMove(Move move)
 {
+    m_game_history.push_back(m_curr_hash);
     // Move the piece and promote if promotion
     Piece finalPiece = ChangePieceTypeIfNotNone(move.moved_piece, move.promoted_to_piece_type);
     BitboardHelpers::ClearBit(m_board[PieceToBitboardIndex(move.moved_piece)], move.from);
@@ -91,7 +92,6 @@ void Board::ForceMakeMove(Move move)
 
 
     m_game_move_history.push_back(move);
-    m_game_history.push_back(m_curr_hash);
     if (GetColor(move.moved_piece) == Black) m_full_move_clock++;
     m_legal_moves_cache.clear();
     is_white_to_move = !is_white_to_move;

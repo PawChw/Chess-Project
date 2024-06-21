@@ -77,6 +77,7 @@ public:
 
 	bool operator==(const Board& other) {
 		auto rs = ply_count == other.ply_count;
+		rs &= m_curr_hash == other.m_curr_hash;
 		rs &= CompareArrays<Bitboard, 12>(m_board, other.m_board);
 		rs &= ep_square == other.ep_square;
 		rs &= CompareArrays(castle_rights.at(1), other.castle_rights.at(1));
