@@ -21,5 +21,6 @@ public:
 	static Zobrist Compute(std::array<Bitboard, 12> bitboards, bool isBlacksTurn);
 	static Zobrist GetMove(Zobrist old, Square from, Square to, Piece piece, bool changeMover = true);
 	static void Move(Zobrist& old, Square from, Square to, Piece piece, bool changeMover = true);
+	static void Capture(Zobrist& old, Square captured, Piece piece);
 };
 

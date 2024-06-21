@@ -15,12 +15,12 @@
 #include "ZobristKey.h"
 #include "MoveHelper.h"
 
-template <typename T, int S>
+template <typename T, int S> //std::array<int,s>
 bool CompareArrays(const std::array<T, S>& arr1, const std::array<T, S>& arr2) {
 	return std::equal(arr1.begin(), arr1.end(), arr2.begin());
 }
 
-template <typename T, int S>
+template <typename T, int S> //int[s]
 bool CompareArrays(const T* arr1, const T* arr2) {
 	return std::equal(arr1, arr1+S, arr2);
 }

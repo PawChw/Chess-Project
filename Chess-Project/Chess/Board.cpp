@@ -26,16 +26,23 @@ void Board::MoveBlocker(Square newBlockerSquare)
 void Board::ForceMakeMove(Move move)
 {
     // Move the piece and promote if promotion
+    Piece finalPiece = ChangePieceTypeIfNotNone(move.moved_piece, move.promoted_to_piece_type);
     BitboardHelpers::ClearBit(m_board[PieceToBitboardIndex(move.moved_piece)], move.from);
-    BitboardHelpers::SetBit(m_board[PieceToBitboardIndex(ChangePieceTypeIfNotNone(move.moved_piece, move.promoted_to_piece_type))], move.to);
+    BitboardHelpers::SetBit(m_board[PieceToBitboardIndex(finalPiece)], move.to);
+    ZobristKey::Capture(m_curr_hash, move.from, move.moved_piece);
+    ZobristKey::Capture(m_curr_hash, move.to, finalPiece);
 
     // Handle en passant capture
     if (move.ep_square == move.to && PieceUtils::GetPieceType(move.moved_piece) == Pawn) {
-        BitboardHelpers::ClearBit(m_board[PieceToBitboardIndex(move.moved_piece^(White|Black))], GetSquare(GetFile(move.to), GetRank(move.from)));
+        Square captureSquare = GetSquare(GetFile(move.to), GetRank(move.from));
+        BitboardHelpers::ClearBit(m_board[PieceToBitboardIndex(move.captured_piece)], captureSquare);
+        ZobristKey::Capture(m_curr_hash, captureSquare, move.captured_piece);
+
     }
     // handle capture
     else if (move.captured_piece) {
         BitboardHelpers::ClearBit(m_board[PieceToBitboardIndex(move.captured_piece)], move.to);
+        ZobristKey::Capture(m_curr_hash, move.to, move.captured_piece);
     }
     // handle castling
     else if (move.is_castle.Get(0)) {
@@ -87,7 +94,6 @@ void Board::ForceMakeMove(Move move)
     m_game_history.push_back(m_curr_hash);
     if (GetColor(move.moved_piece) == Black) m_full_move_clock++;
     m_legal_moves_cache.clear();
-    ZobristKey::Move(m_curr_hash, move.from, move.to, move.moved_piece);
     is_white_to_move = !is_white_to_move;
     ply_count++;
 }
@@ -97,12 +103,15 @@ void Board::UndoMove() {
     Move& move = m_game_move_history.back();
     m_game_move_history.pop_back();
 
+    Piece finalPiece = ChangePieceTypeIfNotNone(move.moved_piece, move.promoted_to_piece_type);
     BitboardHelpers::SetBit(m_board[PieceToBitboardIndex(move.moved_piece)], move.from);
-    BitboardHelpers::ClearBit(m_board[PieceToBitboardIndex(ChangePieceTypeIfNotNone(move.moved_piece, move.promoted_to_piece_type))], move.to);
+    BitboardHelpers::ClearBit(m_board[PieceToBitboardIndex(finalPiece)], move.to);
 
+    Square epCaptureSquare = 0;
     // Handle en passant capture
     if (move.ep_square == move.to && PieceUtils::GetPieceType(move.moved_piece) == Pawn) {
-        BitboardHelpers::SetBit(m_board[PieceToBitboardIndex(move.moved_piece ^ (White | Black))], GetSquare(GetFile(move.to), GetRank(move.from)));
+        epCaptureSquare = GetSquare(GetFile(move.to), GetRank(move.from));
+        BitboardHelpers::SetBit(m_board[PieceToBitboardIndex(move.captured_piece)], epCaptureSquare);
     }
     // handle capture
     else if (move.captured_piece) {
@@ -148,7 +157,14 @@ void Board::UndoMove() {
     }
 
     if (m_game_history.empty()) {
-        ZobristKey::Move(m_curr_hash, move.from, move.to, move.moved_piece);
+        ZobristKey::Capture(m_curr_hash, move.from, move.moved_piece); // remove piece from moved square
+        ZobristKey::Capture(m_curr_hash, move.to, finalPiece); // put piece on new square
+        if (epCaptureSquare) {
+            ZobristKey::Capture(m_curr_hash, epCaptureSquare, move.captured_piece);
+        }
+        else if (move.captured_piece) {
+            ZobristKey::Capture(m_curr_hash, move.to, move.captured_piece);
+        }
     }
     else {
         m_curr_hash = m_game_history.back();

@@ -46,3 +46,10 @@ void ZobristKey::Move(Zobrist& old, Square from, Square to, Piece piece, bool ch
 	old ^= hashes[pieceIndex][from];
 	old ^= hashes[pieceIndex][to];
 }
+
+void ZobristKey::Capture(Zobrist& old, Square captured, Piece piece)
+{
+	int pieceIndex = PieceUtils::GetPieceType(piece) - 1;
+	if (PieceUtils::GetColor(piece) == PieceUtils::Black) pieceIndex += 6;
+	old ^= hashes[pieceIndex][captured];
+}

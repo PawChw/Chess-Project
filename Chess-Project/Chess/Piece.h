@@ -6,17 +6,17 @@ using PieceType = uint8_t;
 using Piece = uint8_t;
 
 namespace PieceUtils {
-	const static Color White = 8;
-	const static Color Black = 16;
+	const static Color White = 8; //		01000
+	const static Color Black = 16; //		10000
 
-	const static PieceType None = 0;
-	const static PieceType Pawn = 1;
-	const static PieceType Knight = 2;
-	const static PieceType Bishop = 3;
-	const static PieceType Rook = 4;
-	const static PieceType Queen = 5;
-	const static PieceType King = 6;
-	const static PieceType Blocker = 7;
+	const static PieceType None = 0; //		00000
+	const static PieceType Pawn = 1;//		00001
+	const static PieceType Knight = 2;//	00010
+	const static PieceType Bishop = 3;//	00011
+	const static PieceType Rook = 4;//		00100
+	const static PieceType Queen = 5;//		00101
+	const static PieceType King = 6;//		00110
+	const static PieceType Blocker = 7;//	00111
 
 
 	Color inline GetColor(Piece piece) noexcept {
